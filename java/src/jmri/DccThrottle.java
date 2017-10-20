@@ -17,11 +17,11 @@ package jmri;
  * @author Bob Jacobsen Copyright (C) 2001
  * @see Throttle
  */
-public interface DccThrottle extends Throttle {
+public abstract class DccThrottle extends Throttle {
 
     // to handle quantized speed. Note this can change! Valued returned is
     // always positive.
-    public float getSpeedIncrement();
+    public abstract float getSpeedIncrement();
 
     // Handle Speed Step Information
     // There are 4 valid speed step modes
@@ -37,14 +37,14 @@ public interface DccThrottle extends Throttle {
      *
      * @param Mode the current speed step mode
      */
-    public void setSpeedStepMode(int Mode);
+    public abstract void setSpeedStepMode(int Mode);
 
     /**
      * Get the current speed step value.
      *
      * @return the current speed step mode
      */
-    public int getSpeedStepMode();
+    public abstract int getSpeedStepMode();
 
     // information on consisting  (how do we set consisting?)
     // register for notification

@@ -96,9 +96,9 @@ public class DCCppThrottle extends AbstractThrottle implements DCCppListener {
     @Override
     protected void sendFunctionGroup1() {
  log.debug("sendFunctionGroup1(): f0 {} f1 {} f2 {} f3 {} f4{}",
-    f0, f1, f2, f3, f4);
+    f[0], f[1], f[2], f[3], f[4]);
         DCCppMessage msg = DCCppMessage.makeFunctionGroup1OpsMsg(this.getDccAddress(),
-                f0, f1, f2, f3, f4);
+                f[0], f[1], f[2], f[3], f[4]);
  log.debug("sendFunctionGroup1(): Message: {}", msg.toString());
         // now, queue the message for sending to the command station
         //queueMessage(msg, THROTTLEFUNCSENT);
@@ -111,7 +111,7 @@ public class DCCppThrottle extends AbstractThrottle implements DCCppListener {
     @Override
     protected void sendFunctionGroup2() {
         DCCppMessage msg = DCCppMessage.makeFunctionGroup2OpsMsg(this.getDccAddress(),
-                f5, f6, f7, f8);
+                f[5], f[6], f[7], f[8]);
         // now, queue the message for sending to the command station
         //queueMessage(msg, THROTTLEFUNCSENT);
         queueMessage(msg, THROTTLEIDLE);
@@ -124,7 +124,7 @@ public class DCCppThrottle extends AbstractThrottle implements DCCppListener {
     @Override
     protected void sendFunctionGroup3() {
         DCCppMessage msg = DCCppMessage.makeFunctionGroup3OpsMsg(this.getDccAddress(),
-                f9, f10, f11, f12);
+                f[9], f[10], f[11], f[12]);
         // now, queue the message for sending to the command station
         //queueMessage(msg, THROTTLEFUNCSENT);
         queueMessage(msg, THROTTLEIDLE);
@@ -137,7 +137,7 @@ public class DCCppThrottle extends AbstractThrottle implements DCCppListener {
     @Override
     protected void sendFunctionGroup4() {
         DCCppMessage msg = DCCppMessage.makeFunctionGroup4OpsMsg(this.getDccAddress(),
-                f13, f14, f15, f16, f17, f18, f19, f20);
+                f[13], f[14], f[15], f[16], f[17], f[18], f[19], f[20]);
         // now, queue the message for sending to the command station
         //queueMessage(msg, THROTTLEFUNCSENT);
         queueMessage(msg, THROTTLEIDLE);
@@ -150,9 +150,9 @@ public class DCCppThrottle extends AbstractThrottle implements DCCppListener {
     @Override
     protected void sendFunctionGroup5() {
  log.debug("sendFunctionGroup5(): f21 {} f22 {} f23 {} f24 {} f25 {} f26 {} f27 {} f28 {}",
-    f21, f22, f23, f24, f25, f26, f27, f28);
+    f[21], f[22], f[23], f[24], f[25], f[26], f[27], f[28]);
         DCCppMessage msg = DCCppMessage.makeFunctionGroup5OpsMsg(this.getDccAddress(),
-                f21, f22, f23, f24, f25, f26, f27, f28);
+                f[21], f[22], f[23], f[24], f[25], f[26], f[27], f[28]);
  log.debug("sendFunctionGroup5(): Message: {}", msg.toString());
         // now, queue the message for sending to the command station
         //queueMessage(msg, THROTTLEFUNCSENT);
@@ -166,7 +166,7 @@ public class DCCppThrottle extends AbstractThrottle implements DCCppListener {
     @Override
     protected void sendMomentaryFunctionGroup1() {
         DCCppMessage msg = DCCppMessage.makeFunctionGroup1SetMomMsg(this.getDccAddress(),
-                f0Momentary, f1Momentary, f2Momentary, f3Momentary, f4Momentary);
+                fMomentary[0], fMomentary[1], fMomentary[2], fMomentary[3], fMomentary[4]);
         // now, queue the message for sending to the command station
         //queueMessage(msg, THROTTLEFUNCSENT);
         queueMessage(msg, THROTTLEIDLE);
@@ -179,7 +179,7 @@ public class DCCppThrottle extends AbstractThrottle implements DCCppListener {
     @Override
     protected void sendMomentaryFunctionGroup2() {
         DCCppMessage msg = DCCppMessage.makeFunctionGroup2SetMomMsg(this.getDccAddress(),
-                f5Momentary, f6Momentary, f7Momentary, f8Momentary);
+                fMomentary[5], fMomentary[6], fMomentary[7], fMomentary[8]);
         // now, queue the message for sending to the command station
         //queueMessage(msg, THROTTLEFUNCSENT);
         queueMessage(msg, THROTTLEIDLE);
@@ -192,7 +192,7 @@ public class DCCppThrottle extends AbstractThrottle implements DCCppListener {
     @Override
     protected void sendMomentaryFunctionGroup3() {
         DCCppMessage msg = DCCppMessage.makeFunctionGroup2SetMomMsg(this.getDccAddress(),
-                f9Momentary, f10Momentary, f11Momentary, f12Momentary);
+                fMomentary[9], fMomentary[10], fMomentary[11], fMomentary[12]);
         // now, queue the message for sending to the command station
         //queueMessage(msg, THROTTLEFUNCSENT);
         queueMessage(msg, THROTTLEIDLE);
@@ -205,8 +205,8 @@ public class DCCppThrottle extends AbstractThrottle implements DCCppListener {
     @Override
     protected void sendMomentaryFunctionGroup4() {
         DCCppMessage msg = DCCppMessage.makeFunctionGroup4SetMomMsg(this.getDccAddress(),
-                f13Momentary, f14Momentary, f15Momentary, f16Momentary,
-                f17Momentary, f18Momentary, f19Momentary, f20Momentary);
+                fMomentary[13], fMomentary[14], fMomentary[15], fMomentary[16],
+                fMomentary[17], fMomentary[18], fMomentary[19], fMomentary[20]);
         // now, queue the message for sending to the command station
         //queueMessage(msg, THROTTLEFUNCSENT);
         queueMessage(msg, THROTTLEIDLE);
@@ -219,8 +219,8 @@ public class DCCppThrottle extends AbstractThrottle implements DCCppListener {
     @Override
     protected void sendMomentaryFunctionGroup5() {
         DCCppMessage msg = DCCppMessage.makeFunctionGroup5SetMomMsg(this.getDccAddress(),
-                f21Momentary, f22Momentary, f23Momentary, f24Momentary,
-                f25Momentary, f26Momentary, f27Momentary, f28Momentary);
+                fMomentary[21], fMomentary[22], fMomentary[23], fMomentary[24],
+                fMomentary[25], fMomentary[26], fMomentary[27], fMomentary[28]);
         // now, queue the message for sending to the command station
         //queueMessage(msg, THROTTLEFUNCSENT);
         queueMessage(msg, THROTTLEIDLE);

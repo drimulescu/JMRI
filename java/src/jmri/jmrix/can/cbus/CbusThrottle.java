@@ -37,6 +37,12 @@ public class CbusThrottle extends AbstractThrottle {
 
         // cache settings
         this.speedSetting = 0;
+        
+        for (int i=0; i <= 28; i++) {
+            f[i] = false;
+            fMomentary[i] = false;
+        }
+/*        
         this.f0 = false;
         this.f1 = false;
         this.f2 = false;
@@ -69,7 +75,7 @@ public class CbusThrottle extends AbstractThrottle {
         this.f26 = false;
         this.f27 = false;
         this.f28 = false;
-
+*/
         this.dccAddress = (DccLocoAddress) address;
         this.isForward = true;
 
@@ -102,6 +108,20 @@ public class CbusThrottle extends AbstractThrottle {
 
         // cache settings
         this.speedSetting = speed & 0x7f;
+        this.f[0] = (f0f4 & CbusConstants.CBUS_F0) == CbusConstants.CBUS_F0;
+        this.f[1] = (f0f4 & CbusConstants.CBUS_F1) == CbusConstants.CBUS_F1;
+        this.f[2] = (f0f4 & CbusConstants.CBUS_F2) == CbusConstants.CBUS_F2;
+        this.f[3] = (f0f4 & CbusConstants.CBUS_F3) == CbusConstants.CBUS_F3;
+        this.f[4] = (f0f4 & CbusConstants.CBUS_F4) == CbusConstants.CBUS_F4;
+        this.f[5] = (f5f8 & CbusConstants.CBUS_F5) == CbusConstants.CBUS_F5;
+        this.f[6] = (f5f8 & CbusConstants.CBUS_F6) == CbusConstants.CBUS_F6;
+        this.f[7] = (f5f8 & CbusConstants.CBUS_F7) == CbusConstants.CBUS_F7;
+        this.f[8] = (f5f8 & CbusConstants.CBUS_F8) == CbusConstants.CBUS_F8;
+        this.f[9] = (f9f12 & CbusConstants.CBUS_F9) == CbusConstants.CBUS_F9;
+        this.f[10] = (f9f12 & CbusConstants.CBUS_F10) == CbusConstants.CBUS_F10;
+        this.f[11] = (f9f12 & CbusConstants.CBUS_F11) == CbusConstants.CBUS_F11;
+        this.f[12] = (f9f12 & CbusConstants.CBUS_F12) == CbusConstants.CBUS_F12;
+/*
         this.f0 = (f0f4 & CbusConstants.CBUS_F0) == CbusConstants.CBUS_F0;
         this.f1 = (f0f4 & CbusConstants.CBUS_F1) == CbusConstants.CBUS_F1;
         this.f2 = (f0f4 & CbusConstants.CBUS_F2) == CbusConstants.CBUS_F2;
@@ -115,7 +135,7 @@ public class CbusThrottle extends AbstractThrottle {
         this.f10 = (f9f12 & CbusConstants.CBUS_F10) == CbusConstants.CBUS_F10;
         this.f11 = (f9f12 & CbusConstants.CBUS_F11) == CbusConstants.CBUS_F11;
         this.f12 = (f9f12 & CbusConstants.CBUS_F12) == CbusConstants.CBUS_F12;
-
+*/
         this.isForward = (speed & 0x80) == 0x80;
     }
 
@@ -238,11 +258,11 @@ public class CbusThrottle extends AbstractThrottle {
      * to a message from the hardware
      */
     protected void updateFunctionGroup1(int fns) {
-        this.f0 = ((fns & CbusConstants.CBUS_F0) == CbusConstants.CBUS_F0);
-        this.f1 = ((fns & CbusConstants.CBUS_F1) == CbusConstants.CBUS_F1);
-        this.f2 = ((fns & CbusConstants.CBUS_F2) == CbusConstants.CBUS_F2);
-        this.f3 = ((fns & CbusConstants.CBUS_F3) == CbusConstants.CBUS_F3);
-        this.f4 = ((fns & CbusConstants.CBUS_F4) == CbusConstants.CBUS_F4);
+        this.f[0] = ((fns & CbusConstants.CBUS_F0) == CbusConstants.CBUS_F0);
+        this.f[1] = ((fns & CbusConstants.CBUS_F1) == CbusConstants.CBUS_F1);
+        this.f[2] = ((fns & CbusConstants.CBUS_F2) == CbusConstants.CBUS_F2);
+        this.f[3] = ((fns & CbusConstants.CBUS_F3) == CbusConstants.CBUS_F3);
+        this.f[4] = ((fns & CbusConstants.CBUS_F4) == CbusConstants.CBUS_F4);
     }
 
     /**
@@ -250,10 +270,10 @@ public class CbusThrottle extends AbstractThrottle {
      * message from the hardware
      */
     protected void updateFunctionGroup2(int fns) {
-        this.f5 = ((fns & CbusConstants.CBUS_F5) == CbusConstants.CBUS_F5);
-        this.f6 = ((fns & CbusConstants.CBUS_F6) == CbusConstants.CBUS_F6);
-        this.f7 = ((fns & CbusConstants.CBUS_F7) == CbusConstants.CBUS_F7);
-        this.f8 = ((fns & CbusConstants.CBUS_F8) == CbusConstants.CBUS_F8);
+        this.f[5] = ((fns & CbusConstants.CBUS_F5) == CbusConstants.CBUS_F5);
+        this.f[6] = ((fns & CbusConstants.CBUS_F6) == CbusConstants.CBUS_F6);
+        this.f[7] = ((fns & CbusConstants.CBUS_F7) == CbusConstants.CBUS_F7);
+        this.f[8] = ((fns & CbusConstants.CBUS_F8) == CbusConstants.CBUS_F8);
     }
 
     /**
@@ -261,10 +281,10 @@ public class CbusThrottle extends AbstractThrottle {
      * a message from the hardware
      */
     protected void updateFunctionGroup3(int fns) {
-        this.f9 = ((fns & CbusConstants.CBUS_F9) == CbusConstants.CBUS_F9);
-        this.f10 = ((fns & CbusConstants.CBUS_F10) == CbusConstants.CBUS_F10);
-        this.f11 = ((fns & CbusConstants.CBUS_F11) == CbusConstants.CBUS_F11);
-        this.f12 = ((fns & CbusConstants.CBUS_F12) == CbusConstants.CBUS_F12);
+        this.f[9] = ((fns & CbusConstants.CBUS_F9) == CbusConstants.CBUS_F9);
+        this.f[10] = ((fns & CbusConstants.CBUS_F10) == CbusConstants.CBUS_F10);
+        this.f[11] = ((fns & CbusConstants.CBUS_F11) == CbusConstants.CBUS_F11);
+        this.f[12] = ((fns & CbusConstants.CBUS_F12) == CbusConstants.CBUS_F12);
     }
 
     /**
@@ -272,14 +292,14 @@ public class CbusThrottle extends AbstractThrottle {
      * F19, F20 in response to a message from the hardware
      */
     protected void updateFunctionGroup4(int fns) {
-        this.f13 = ((fns & CbusConstants.CBUS_F13) == CbusConstants.CBUS_F13);
-        this.f14 = ((fns & CbusConstants.CBUS_F14) == CbusConstants.CBUS_F14);
-        this.f15 = ((fns & CbusConstants.CBUS_F15) == CbusConstants.CBUS_F15);
-        this.f16 = ((fns & CbusConstants.CBUS_F16) == CbusConstants.CBUS_F16);
-        this.f17 = ((fns & CbusConstants.CBUS_F17) == CbusConstants.CBUS_F17);
-        this.f18 = ((fns & CbusConstants.CBUS_F18) == CbusConstants.CBUS_F18);
-        this.f19 = ((fns & CbusConstants.CBUS_F19) == CbusConstants.CBUS_F19);
-        this.f20 = ((fns & CbusConstants.CBUS_F20) == CbusConstants.CBUS_F20);
+        this.f[13] = ((fns & CbusConstants.CBUS_F13) == CbusConstants.CBUS_F13);
+        this.f[14] = ((fns & CbusConstants.CBUS_F14) == CbusConstants.CBUS_F14);
+        this.f[15] = ((fns & CbusConstants.CBUS_F15) == CbusConstants.CBUS_F15);
+        this.f[16] = ((fns & CbusConstants.CBUS_F16) == CbusConstants.CBUS_F16);
+        this.f[17] = ((fns & CbusConstants.CBUS_F17) == CbusConstants.CBUS_F17);
+        this.f[18] = ((fns & CbusConstants.CBUS_F18) == CbusConstants.CBUS_F18);
+        this.f[19] = ((fns & CbusConstants.CBUS_F19) == CbusConstants.CBUS_F19);
+        this.f[20] = ((fns & CbusConstants.CBUS_F20) == CbusConstants.CBUS_F20);
     }
 
     /**
@@ -287,14 +307,14 @@ public class CbusThrottle extends AbstractThrottle {
      * F27, F28 in response to a message from the hardware
      */
     protected void updateFunctionGroup5(int fns) {
-        this.f21 = ((fns & CbusConstants.CBUS_F21) == CbusConstants.CBUS_F21);
-        this.f22 = ((fns & CbusConstants.CBUS_F22) == CbusConstants.CBUS_F22);
-        this.f23 = ((fns & CbusConstants.CBUS_F23) == CbusConstants.CBUS_F23);
-        this.f24 = ((fns & CbusConstants.CBUS_F24) == CbusConstants.CBUS_F24);
-        this.f25 = ((fns & CbusConstants.CBUS_F25) == CbusConstants.CBUS_F25);
-        this.f26 = ((fns & CbusConstants.CBUS_F26) == CbusConstants.CBUS_F26);
-        this.f27 = ((fns & CbusConstants.CBUS_F27) == CbusConstants.CBUS_F27);
-        this.f28 = ((fns & CbusConstants.CBUS_F28) == CbusConstants.CBUS_F28);
+        this.f[21] = ((fns & CbusConstants.CBUS_F21) == CbusConstants.CBUS_F21);
+        this.f[22] = ((fns & CbusConstants.CBUS_F22) == CbusConstants.CBUS_F22);
+        this.f[23] = ((fns & CbusConstants.CBUS_F23) == CbusConstants.CBUS_F23);
+        this.f[24] = ((fns & CbusConstants.CBUS_F24) == CbusConstants.CBUS_F24);
+        this.f[25] = ((fns & CbusConstants.CBUS_F25) == CbusConstants.CBUS_F25);
+        this.f[26] = ((fns & CbusConstants.CBUS_F26) == CbusConstants.CBUS_F26);
+        this.f[27] = ((fns & CbusConstants.CBUS_F27) == CbusConstants.CBUS_F27);
+        this.f[28] = ((fns & CbusConstants.CBUS_F28) == CbusConstants.CBUS_F28);
     }
 
     /**
@@ -302,6 +322,8 @@ public class CbusThrottle extends AbstractThrottle {
      * hardware
      */
     protected void updateFunction(int fn, boolean state) {
+        this.f[fn] = state;
+/*
         switch (fn) {
             case 0:
                 this.f0 = state;
@@ -394,6 +416,7 @@ public class CbusThrottle extends AbstractThrottle {
                 log.warn("Unhandled function number: {}", fn);
                 break;
         }
+*/        
     }
 
     /**

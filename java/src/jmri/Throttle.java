@@ -28,7 +28,7 @@ import java.util.Vector;
  *
  * @author Bob Jacobsen Copyright (C) 2001, 2008
  */
-public interface Throttle {
+public abstract class Throttle {
 
     /**
      * Constants to represent the functions F0 through F28.
@@ -101,255 +101,263 @@ public interface Throttle {
      *
      * @return the speed as a percentage of maximum possible speed
      */
-    public float getSpeedSetting();
+    public abstract float getSpeedSetting();
 
-    public void setSpeedSetting(float speed);
+    public abstract void setSpeedSetting(float speed);
 
     /**
      * direction This is an bound property.
      *
      * @return true if forward, false if reverse or undefined
      */
-    public boolean getIsForward();
+    public abstract boolean getIsForward();
 
-    public void setIsForward(boolean forward);
+    public abstract void setIsForward(boolean forward);
 
     // functions - note that we use the naming for DCC, though that's not the implication;
     // see also DccThrottle interface
-    public boolean getF0();
+    public abstract boolean getF(int function);
+    
+    public abstract void setF(int function, boolean value);
+    
+    public final boolean getF0() { return getF(0); }
 
-    public void setF0(boolean f0);
+    public final void setF0(boolean f0) { setF(0, f0); }
 
-    public boolean getF1();
+    public final boolean getF1() { return getF(1); }
 
-    public void setF1(boolean f1);
+    public final void setF1(boolean f1) { setF(1, f1); }
 
-    public boolean getF2();
+    public final boolean getF2() { return getF(2); }
 
-    public void setF2(boolean f2);
+    public final void setF2(boolean f2) { setF(2, f2); }
 
-    public boolean getF3();
+    public final boolean getF3() { return getF(3); }
 
-    public void setF3(boolean f3);
+    public final void setF3(boolean f3) { setF(3, f3); }
 
-    public boolean getF4();
+    public final boolean getF4() { return getF(4); }
 
-    public void setF4(boolean f4);
+    public final void setF4(boolean f4) { setF(4, f4); }
 
-    public boolean getF5();
+    public final boolean getF5() { return getF(5); }
 
-    public void setF5(boolean f5);
+    public final void setF5(boolean f5) { setF(5, f5); }
 
-    public boolean getF6();
+    public final boolean getF6() { return getF(6); }
 
-    public void setF6(boolean f6);
+    public final void setF6(boolean f6) { setF(6, f6); }
 
-    public boolean getF7();
+    public final boolean getF7() { return getF(7); }
 
-    public void setF7(boolean f7);
+    public final void setF7(boolean f7) { setF(7, f7); }
 
-    public boolean getF8();
+    public final boolean getF8() { return getF(8); }
 
-    public void setF8(boolean f8);
+    public final void setF8(boolean f8) { setF(8, f8); }
 
-    public boolean getF9();
+    public final boolean getF9() { return getF(9); }
 
-    public void setF9(boolean f9);
+    public final void setF9(boolean f9) { setF(9, f9); }
 
-    public boolean getF10();
+    public final boolean getF10() { return getF(10); }
 
-    public void setF10(boolean f10);
+    public final void setF10(boolean f10) { setF(10, f10); }
 
-    public boolean getF11();
+    public final boolean getF11() { return getF(11); }
 
-    public void setF11(boolean f11);
+    public final void setF11(boolean f11) { setF(11, f11); }
 
-    public boolean getF12();
+    public final boolean getF12() { return getF(12); }
 
-    public void setF12(boolean f12);
+    public final void setF12(boolean f12) { setF(12, f12); }
 
-    public boolean getF13();
+    public final boolean getF13() { return getF(13); }
 
-    public void setF13(boolean f13);
+    public final void setF13(boolean f13) { setF(13, f13); }
 
-    public boolean getF14();
+    public final boolean getF14() { return getF(14); }
 
-    public void setF14(boolean f14);
+    public final void setF14(boolean f14) { setF(14, f14); }
 
-    public boolean getF15();
+    public final boolean getF15() { return getF(15); }
 
-    public void setF15(boolean f15);
+    public final void setF15(boolean f15) { setF(15, f15); }
 
-    public boolean getF16();
+    public final boolean getF16() { return getF(16); }
 
-    public void setF16(boolean f16);
+    public final void setF16(boolean f16) { setF(16, f16); }
 
-    public boolean getF17();
+    public final boolean getF17() { return getF(17); }
 
-    public void setF17(boolean f17);
+    public final void setF17(boolean f17) { setF(17, f17); }
 
-    public boolean getF18();
+    public final boolean getF18() { return getF(18); }
 
-    public void setF18(boolean f18);
+    public final void setF18(boolean f18) { setF(18, f18); }
 
-    public boolean getF19();
+    public final boolean getF19() { return getF(19); }
 
-    public void setF19(boolean f19);
+    public final void setF19(boolean f19) { setF(19, f19); }
 
-    public boolean getF20();
+    public final boolean getF20() { return getF(20); }
 
-    public void setF20(boolean f20);
+    public final void setF20(boolean f20) { setF(20, f20); }
 
-    public boolean getF21();
+    public final boolean getF21() { return getF(21); }
 
-    public void setF21(boolean f21);
+    public final void setF21(boolean f21) { setF(21, f21); }
 
-    public boolean getF22();
+    public final boolean getF22() { return getF(22); }
 
-    public void setF22(boolean f22);
+    public final void setF22(boolean f22) { setF(22, f22); }
 
-    public boolean getF23();
+    public final boolean getF23() { return getF(23); }
 
-    public void setF23(boolean f23);
+    public final void setF23(boolean f23) { setF(23, f23); }
 
-    public boolean getF24();
+    public final boolean getF24() { return getF(24); }
 
-    public void setF24(boolean f24);
+    public final void setF24(boolean f24) { setF(24, f24); }
 
-    public boolean getF25();
+    public final boolean getF25() { return getF(25); }
 
-    public void setF25(boolean f25);
+    public final void setF25(boolean f25) { setF(25, f25); }
 
-    public boolean getF26();
+    public final boolean getF26() { return getF(26); }
 
-    public void setF26(boolean f26);
+    public final void setF26(boolean f26) { setF(26, f26); }
 
-    public boolean getF27();
+    public final boolean getF27() { return getF(27); }
 
-    public void setF27(boolean f27);
+    public final void setF27(boolean f27) { setF(27, f27); }
 
-    public boolean getF28();
+    public final boolean getF28() { return getF(28); }
 
-    public void setF28(boolean f28);
+    public final void setF28(boolean f28) { setF(28, f28); }
 
     // functions momentary status - note that we use the naming for DCC, 
     // though that's not the implication;
     // see also DccThrottle interface
-    public boolean getF0Momentary();
+    public abstract boolean getFMomentary(int function);
 
-    public void setF0Momentary(boolean f0Momentary);
+    public abstract void setFMomentary(int function, boolean value);
 
-    public boolean getF1Momentary();
+    public final boolean getF0Momentary() { return getFMomentary(0); }
 
-    public void setF1Momentary(boolean f1Momentary);
+    public final void setF0Momentary(boolean f0Momentary) { setFMomentary(0, f0Momentary); }
 
-    public boolean getF2Momentary();
+    public final boolean getF1Momentary() { return getFMomentary(1); }
 
-    public void setF2Momentary(boolean f2Momentary);
+    public final void setF1Momentary(boolean f1Momentary) { setFMomentary(1, f1Momentary); }
 
-    public boolean getF3Momentary();
+    public final boolean getF2Momentary() { return getFMomentary(2); }
 
-    public void setF3Momentary(boolean f3Momentary);
+    public final void setF2Momentary(boolean f2Momentary) { setFMomentary(2, f2Momentary); }
 
-    public boolean getF4Momentary();
+    public final boolean getF3Momentary() { return getFMomentary(3); }
 
-    public void setF4Momentary(boolean f4Momentary);
+    public final void setF3Momentary(boolean f3Momentary) { setFMomentary(3, f3Momentary); }
 
-    public boolean getF5Momentary();
+    public final boolean getF4Momentary() { return getFMomentary(4); }
 
-    public void setF5Momentary(boolean f5Momentary);
+    public final void setF4Momentary(boolean f4Momentary) { setFMomentary(4, f4Momentary); }
 
-    public boolean getF6Momentary();
+    public final boolean getF5Momentary() { return getFMomentary(5); }
 
-    public void setF6Momentary(boolean f6Momentary);
+    public final void setF5Momentary(boolean f5Momentary) { setFMomentary(5, f5Momentary); }
 
-    public boolean getF7Momentary();
+    public final boolean getF6Momentary() { return getFMomentary(6); }
 
-    public void setF7Momentary(boolean f7Momentary);
+    public final void setF6Momentary(boolean f6Momentary) { setFMomentary(6, f6Momentary); }
 
-    public boolean getF8Momentary();
+    public final boolean getF7Momentary() { return getFMomentary(7); }
 
-    public void setF8Momentary(boolean f8Momentary);
+    public final void setF7Momentary(boolean f7Momentary) { setFMomentary(7, f7Momentary); }
 
-    public boolean getF9Momentary();
+    public final boolean getF8Momentary() { return getFMomentary(8); }
 
-    public void setF9Momentary(boolean f9Momentary);
+    public final void setF8Momentary(boolean f8Momentary) { setFMomentary(8, f8Momentary); }
 
-    public boolean getF10Momentary();
+    public final boolean getF9Momentary() { return getFMomentary(9); }
 
-    public void setF10Momentary(boolean f10Momentary);
+    public final void setF9Momentary(boolean f9Momentary) { setFMomentary(9, f9Momentary); }
 
-    public boolean getF11Momentary();
+    public final boolean getF10Momentary() { return getFMomentary(10); }
 
-    public void setF11Momentary(boolean f11Momentary);
+    public final void setF10Momentary(boolean f10Momentary) { setFMomentary(10, f10Momentary); }
 
-    public boolean getF12Momentary();
+    public final boolean getF11Momentary() { return getFMomentary(11); }
 
-    public void setF12Momentary(boolean f12Momentary);
+    public final void setF11Momentary(boolean f11Momentary) { setFMomentary(11, f11Momentary); }
 
-    public boolean getF13Momentary();
+    public final boolean getF12Momentary() { return getFMomentary(12); }
 
-    public void setF13Momentary(boolean f13Momentary);
+    public final void setF12Momentary(boolean f12Momentary) { setFMomentary(12, f12Momentary); }
 
-    public boolean getF14Momentary();
+    public final boolean getF13Momentary() { return getFMomentary(13); }
 
-    public void setF14Momentary(boolean f14Momentary);
+    public final void setF13Momentary(boolean f13Momentary) { setFMomentary(13, f13Momentary); }
 
-    public boolean getF15Momentary();
+    public final boolean getF14Momentary() { return getFMomentary(14); }
 
-    public void setF15Momentary(boolean f15Momentary);
+    public final void setF14Momentary(boolean f14Momentary) { setFMomentary(14, f14Momentary); }
 
-    public boolean getF16Momentary();
+    public final boolean getF15Momentary() { return getFMomentary(15); }
 
-    public void setF16Momentary(boolean f16Momentary);
+    public final void setF15Momentary(boolean f15Momentary) { setFMomentary(15, f15Momentary); }
 
-    public boolean getF17Momentary();
+    public final boolean getF16Momentary() { return getFMomentary(16); }
 
-    public void setF17Momentary(boolean f17Momentary);
+    public final void setF16Momentary(boolean f16Momentary) { setFMomentary(16, f16Momentary); }
 
-    public boolean getF18Momentary();
+    public final boolean getF17Momentary() { return getFMomentary(17); }
 
-    public void setF18Momentary(boolean f18Momentary);
+    public final void setF17Momentary(boolean f17Momentary) { setFMomentary(17, f17Momentary); }
 
-    public boolean getF19Momentary();
+    public final boolean getF18Momentary() { return getFMomentary(18); }
 
-    public void setF19Momentary(boolean f19Momentary);
+    public final void setF18Momentary(boolean f18Momentary) { setFMomentary(18, f18Momentary); }
 
-    public boolean getF20Momentary();
+    public final boolean getF19Momentary() { return getFMomentary(19); }
 
-    public void setF20Momentary(boolean f20Momentary);
+    public final void setF19Momentary(boolean f19Momentary) { setFMomentary(19, f19Momentary); }
 
-    public boolean getF21Momentary();
+    public final boolean getF20Momentary() { return getFMomentary(20); }
 
-    public void setF21Momentary(boolean f21Momentary);
+    public final void setF20Momentary(boolean f20Momentary) { setFMomentary(20, f20Momentary); }
 
-    public boolean getF22Momentary();
+    public final boolean getF21Momentary() { return getFMomentary(21); }
 
-    public void setF22Momentary(boolean f22Momentary);
+    public final void setF21Momentary(boolean f21Momentary) { setFMomentary(21, f21Momentary); }
 
-    public boolean getF23Momentary();
+    public final boolean getF22Momentary() { return getFMomentary(22); }
 
-    public void setF23Momentary(boolean f23Momentary);
+    public final void setF22Momentary(boolean f22Momentary) { setFMomentary(22, f22Momentary); }
 
-    public boolean getF24Momentary();
+    public final boolean getF23Momentary() { return getFMomentary(23); }
 
-    public void setF24Momentary(boolean f24Momentary);
+    public final void setF23Momentary(boolean f23Momentary) { setFMomentary(23, f23Momentary); }
 
-    public boolean getF25Momentary();
+    public final boolean getF24Momentary() { return getFMomentary(24); }
 
-    public void setF25Momentary(boolean f25Momentary);
+    public final void setF24Momentary(boolean f24Momentary) { setFMomentary(24, f24Momentary); }
 
-    public boolean getF26Momentary();
+    public final boolean getF25Momentary() { return getFMomentary(25); }
 
-    public void setF26Momentary(boolean f26Momentary);
+    public final void setF25Momentary(boolean f25Momentary) { setFMomentary(25, f25Momentary); }
 
-    public boolean getF27Momentary();
+    public final boolean getF26Momentary() { return getFMomentary(26); }
 
-    public void setF27Momentary(boolean f27Momentary);
+    public final void setF26Momentary(boolean f26Momentary) { setFMomentary(26, f26Momentary); }
 
-    public boolean getF28Momentary();
+    public final boolean getF27Momentary() { return getFMomentary(27); }
 
-    public void setF28Momentary(boolean f28Momentary);
+    public final void setF27Momentary(boolean f27Momentary) { setFMomentary(27, f27Momentary); }
+
+    public final boolean getF28Momentary() { return getFMomentary(28); }
+
+    public final void setF28Momentary(boolean f28Momentary) { setFMomentary(28, f28Momentary); }
 
     /**
      * Locomotive address. The exact format is defined by the specific
@@ -360,14 +368,14 @@ public interface Throttle {
      *
      * @return The locomotive address
      */
-    public LocoAddress getLocoAddress();
+    public abstract LocoAddress getLocoAddress();
 
     // register for notification if any of the properties change
-    public void removePropertyChangeListener(java.beans.PropertyChangeListener p);
+    public abstract void removePropertyChangeListener(java.beans.PropertyChangeListener p);
 
-    public void addPropertyChangeListener(java.beans.PropertyChangeListener p);
+    public abstract void addPropertyChangeListener(java.beans.PropertyChangeListener p);
 
-    public Vector<java.beans.PropertyChangeListener> getListeners();
+    public abstract Vector<java.beans.PropertyChangeListener> getListeners();
 
     /**
      * Not for general use, see {@link #release()} and {@link #dispatch()}.
@@ -385,7 +393,7 @@ public interface Throttle {
      * throttle manager or by using {@link #dispose(ThrottleListener l)}.
      */
     @Deprecated
-    public void dispose();
+    public abstract void dispose();
 
     /**
      * Finished with this Throttle, tell the layout that the locomotive is
@@ -400,7 +408,7 @@ public interface Throttle {
      * throttle manager or by using {@link #release(ThrottleListener l)}
      */
     @Deprecated
-    public void release();
+    public abstract void release();
 
     /**
      * Finished with this Throttle, tell the layout that the locomotive is
@@ -417,7 +425,7 @@ public interface Throttle {
      * throttle manager, or by using {@link #dispatch(ThrottleListener l)}
      */
     @Deprecated
-    public void dispatch();
+    public abstract void dispatch();
 
     /**
      * Not for general use, see {@link #release(ThrottleListener l)} and
@@ -434,7 +442,7 @@ public interface Throttle {
      *
      * @param l {@link ThrottleListener} to dispose of
      */
-    public void dispose(ThrottleListener l);
+    public abstract void dispose(ThrottleListener l);
 
     /**
      * Finished with this Throttle, tell the layout that the locomotive is
@@ -447,7 +455,7 @@ public interface Throttle {
      *
      * @param l {@link ThrottleListener} to release
      */
-    public void release(ThrottleListener l);
+    public abstract void release(ThrottleListener l);
 
     /**
      * Finished with this Throttle, tell the layout that the locomotive is
@@ -462,9 +470,9 @@ public interface Throttle {
      *
      * @param l {@link ThrottleListener} to dispatch
      */
-    public void dispatch(ThrottleListener l);
+    public abstract void dispatch(ThrottleListener l);
 
-    public void setRosterEntry(BasicRosterEntry re);
+    public abstract void setRosterEntry(BasicRosterEntry re);
 
-    public BasicRosterEntry getRosterEntry();
+    public abstract BasicRosterEntry getRosterEntry();
 }

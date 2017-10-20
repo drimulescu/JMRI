@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Bob Jacobsen Copyright (C) 2001, 2005
  */
-abstract public class AbstractThrottle implements DccThrottle {
+abstract public class AbstractThrottle extends DccThrottle {
 
     public final static float SPEED_STEP_14_INCREMENT = 1.0f / 14.0f;
     public final static float SPEED_STEP_27_INCREMENT = 1.0f / 27.0f;
@@ -39,16 +39,18 @@ abstract public class AbstractThrottle implements DccThrottle {
      */
     protected int speedStepMode;
     protected boolean isForward;
-    protected boolean f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12;
-    protected boolean f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23,
-            f24, f25, f26, f27, f28;
-    protected boolean f0Momentary, f1Momentary, f2Momentary, f3Momentary,
-            f4Momentary, f5Momentary, f6Momentary, f7Momentary, f8Momentary,
-            f9Momentary, f10Momentary, f11Momentary, f12Momentary;
-    protected boolean f13Momentary, f14Momentary, f15Momentary, f16Momentary,
-            f17Momentary, f18Momentary, f19Momentary, f20Momentary,
-            f21Momentary, f22Momentary, f23Momentary, f24Momentary,
-            f25Momentary, f26Momentary, f27Momentary, f28Momentary;
+    protected boolean[] f = new boolean[29];
+    protected boolean[] fMomentary = new boolean[29];
+//    protected boolean f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12;
+//    protected boolean f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23,
+//            f24, f25, f26, f27, f28;
+//    protected boolean f0Momentary, f1Momentary, f2Momentary, f3Momentary,
+//            f4Momentary, f5Momentary, f6Momentary, f7Momentary, f8Momentary,
+//            f9Momentary, f10Momentary, f11Momentary, f12Momentary;
+//    protected boolean f13Momentary, f14Momentary, f15Momentary, f16Momentary,
+//            f17Momentary, f18Momentary, f19Momentary, f20Momentary,
+//            f21Momentary, f22Momentary, f23Momentary, f24Momentary,
+//            f25Momentary, f26Momentary, f27Momentary, f28Momentary;
 
     /**
      * Is this object still usable? Set false after dispose, this variable is
@@ -113,6 +115,11 @@ abstract public class AbstractThrottle implements DccThrottle {
 
     // functions - note that we use the naming for DCC, though that's not the implication;
     // see also DccThrottle interface
+    @Override
+    public boolean getF(int function) {
+        return f[function];
+    }
+/*
     @Override
     public boolean getF0() {
         return f0;
@@ -257,10 +264,15 @@ abstract public class AbstractThrottle implements DccThrottle {
     public boolean getF28() {
         return f28;
     }
-
+*/
     // function momentary status  - note that we use the naming for DCC, 
     // though that's not the implication;
     // see also DccThrottle interface
+    @Override
+    public boolean getFMomentary(int function) {
+        return fMomentary[function];
+    }
+/*
     @Override
     public boolean getF0Momentary() {
         return f0Momentary;
@@ -405,7 +417,7 @@ abstract public class AbstractThrottle implements DccThrottle {
     public boolean getF28Momentary() {
         return f28Momentary;
     }
-
+*/
     // register for notification if any of the properties change
     @Override
     public void removePropertyChangeListener(PropertyChangeListener l) {
@@ -552,6 +564,26 @@ abstract public class AbstractThrottle implements DccThrottle {
 
     // functions - note that we use the naming for DCC, though that's not the implication;
     // see also DccThrottle interface
+    @Override
+    public void setF(int function, boolean value) {
+        boolean old = this.f[function];
+        this.f[function] = value;
+        if (function >= 0 && function <= 4)
+            sendFunctionGroup1();
+        else if (function >= 5 && function <= 8)
+            sendFunctionGroup2();
+        else if (function >= 9 && function <= 12)
+            sendFunctionGroup3();
+        else if (function >= 13 && function <= 20)
+            sendFunctionGroup4();
+        else if (function >= 21 && function <= 28)
+            sendFunctionGroup5();
+        if (old != this.f[function]) {
+            notifyPropertyChangeListener(String.format("F%d",function), old, this.f[function]);
+//            notifyPropertyChangeListener(Throttle.F0, old, this.f[function]);
+        }
+    }
+/*
     @Override
     public void setF0(boolean f0) {
         boolean old = this.f0;
@@ -841,7 +873,7 @@ abstract public class AbstractThrottle implements DccThrottle {
             notifyPropertyChangeListener(Throttle.F28, old, this.f28);
         }
     }
-
+*/
     /**
      * Send the message to set the state of functions F0, F1, F2, F3, F4.
      * <P>
@@ -940,6 +972,26 @@ abstract public class AbstractThrottle implements DccThrottle {
     // function momentary status  - note that we use the naming for DCC, 
     // though that's not the implication;
     // see also DccThrottle interface
+    @Override
+    public void setFMomentary(int function, boolean value) {
+        boolean old = this.fMomentary[function];
+        this.fMomentary[function] = value;
+        if (function >= 0 && function <= 4)
+            sendMomentaryFunctionGroup1();
+        else if (function >= 5 && function <= 8)
+            sendMomentaryFunctionGroup2();
+        else if (function >= 9 && function <= 12)
+            sendMomentaryFunctionGroup3();
+        else if (function >= 13 && function <= 20)
+            sendMomentaryFunctionGroup4();
+        else if (function >= 21 && function <= 28)
+            sendMomentaryFunctionGroup5();
+        if (old != this.fMomentary[function]) {
+            notifyPropertyChangeListener(String.format("F%d",function), old, this.fMomentary[function]);
+//            notifyPropertyChangeListener(Throttle.F0, old, this.fMomentary[function]);
+        }
+    }
+/*    
     @Override
     public void setF0Momentary(boolean f0Momentary) {
         boolean old = this.f0Momentary;
@@ -1229,7 +1281,7 @@ abstract public class AbstractThrottle implements DccThrottle {
             notifyPropertyChangeListener(Throttle.F28Momentary, old, this.f28Momentary);
         }
     }
-
+*/
     /**
      * Send the message to set the momentary state of functions F0, F1, F2, F3,
      * F4.
