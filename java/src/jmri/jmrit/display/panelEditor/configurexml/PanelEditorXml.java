@@ -48,6 +48,9 @@ public class PanelEditorXml extends AbstractXmlAdapter {
         panel.setAttribute("y", "" + posn.y);
         panel.setAttribute("height", "" + size.height);
         panel.setAttribute("width", "" + size.width);
+        panel.setAttribute("rotation", "" + p.getTargetPanel().getRotation());
+        panel.setAttribute("mirrorHoriz", "" + (p.getTargetPanel().getMirrorHoriz() ? "yes" : "no"));
+        panel.setAttribute("mirrorVert", "" + (p.getTargetPanel().getMirrorVert() ? "yes" : "no"));
         panel.setAttribute("editable", "" + (p.isEditable() ? "yes" : "no"));
         panel.setAttribute("positionable", "" + (p.allPositionable() ? "yes" : "no"));
         //panel.setAttribute("showcoordinates", ""+(p.showCoordinates()?"yes":"no"));
@@ -105,13 +108,23 @@ public class PanelEditorXml extends AbstractXmlAdapter {
         int y = 0;
         int height = 400;
         int width = 300;
+        int rotation = 0;
+        boolean mirrorHoriz = false;
+        boolean mirrorVert = false;
         try {
             x = shared.getAttribute("x").getIntValue();
             y = shared.getAttribute("y").getIntValue();
             height = shared.getAttribute("height").getIntValue();
             width = shared.getAttribute("width").getIntValue();
+            rotation = shared.getAttribute("rotation").getIntValue();
+            mirrorHoriz = shared.getAttribute("mirrorHoriz").getBooleanValue();
+            mirrorVert = shared.getAttribute("mirrorVert").getBooleanValue();
         } catch (org.jdom2.DataConversionException e) {
             log.error("failed to convert PanelEditor's attribute");
+            result = false;
+        }
+        if ((rotation < 0) || (rotation > 3)) {
+            log.error("rotation attribute must be 0 <= x <= 3");
             result = false;
         }
         // find the name
@@ -217,6 +230,12 @@ public class PanelEditorXml extends AbstractXmlAdapter {
             }
         }
         panel.disposeLoadData();     // dispose of url correction data
+
+        // Set orientation of the target panel.
+        // This must be done after the items on the panel are loaded.
+        // That way, it can make sure that all items fit on the panel
+        // even if the panel is rotated.
+        panel.setTargetPanelOrientation(mirrorHoriz,mirrorVert,rotation);
 
         // display the results, with the editor in back
         panel.pack();

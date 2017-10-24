@@ -23,6 +23,9 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -166,7 +169,7 @@ abstract public class Editor extends JmriJFrame implements MouseListener, MouseM
     boolean showCloseInfoMessage = true; //display info message when closing panel
 
     protected ArrayList<Positionable> _contents = new ArrayList<Positionable>();
-    protected JLayeredPane _targetPanel;
+    protected TargetPane _targetPanel;
     private JFrame _targetFrame;
     private JScrollPane _panelScrollPane;
 
@@ -387,18 +390,18 @@ abstract public class Editor extends JmriJFrame implements MouseListener, MouseM
      * @param targetPanel the panel to be edited
      * @param frame       the frame to embed the panel in
      */
-    protected void setTargetPanel(JLayeredPane targetPanel, JmriJFrame frame) {
-        if (targetPanel == null) {
-            _targetPanel = new TargetPane();
-        } else {
-            _targetPanel = targetPanel;
-        }
+    protected void setTargetPanel(TargetPane targetPanel, JmriJFrame frame) {
         // If on a headless system, set heavyweight components to null
         // and don't attach mouse and keyboard listeners to the panel
         if (GraphicsEnvironment.isHeadless()) {
             _panelScrollPane = null;
             _targetFrame = null;
             return;
+        }
+        if (targetPanel == null) {
+            _targetPanel = new TargetPane();
+        } else {
+            _targetPanel = targetPanel;
         }
         if (frame == null) {
             _targetFrame = this;
@@ -415,8 +418,8 @@ abstract public class Editor extends JmriJFrame implements MouseListener, MouseM
                 targetWindowClosingEvent(e);
             }
         });
-        _targetPanel.addMouseListener(this);
-        _targetPanel.addMouseMotionListener(this);
+        _targetPanel.addMouseListener(new EditorMouseListener(this));
+        _targetPanel.addMouseMotionListener(new EditorMouseMotionListener(this));
         _targetPanel.setFocusable(true);
         _targetPanel.addKeyListener(this);
         //_targetFrame.pack();
@@ -438,7 +441,7 @@ abstract public class Editor extends JmriJFrame implements MouseListener, MouseM
      *
      * @return the target panel
      */
-    public final JComponent getTargetPanel() {
+    public final TargetPane getTargetPanel() {
         return _targetPanel;
     }
 
@@ -550,16 +553,217 @@ abstract public class Editor extends JmriJFrame implements MouseListener, MouseM
         int h = 100;
         int w = 150;
 
+        private boolean _orientationMirrorHoriz = false;     // Mirror horizontal
+        private boolean _orientationMirrorVert = false;     // Mirror vertikal
+        private int _orientationRotateQuadrant = 0;             // Rotate by the specified number of quadrants. Only 0, 1, 2 and 3 is allowed
+        private final AffineTransform transform = new AffineTransform();
+        private final AffineTransform inverseTransform = new AffineTransform();
+
         public TargetPane() {
             setLayout(null);
+        }
+
+        /**
+         * Are children of this panel allowed to move?
+         * @return true if children are allowed to move
+         */
+        public boolean allowChildMovement() {
+            return (_orientationRotateQuadrant == 0) && !_orientationMirrorHoriz && !_orientationMirrorVert;
+        }
+        
+        /**
+         * Set the rotation of the panel
+         * @param quadrant The number of 90 degree arcs to rotate by. Only 0, 1, 2 and 3 are allowed
+         */
+        public void setRotation(int quadrant) {
+            if ((quadrant < 0) || (quadrant > 3))
+                throw new IllegalArgumentException("quadrant must be 0 <= x <= 3");
+
+            _orientationRotateQuadrant = quadrant;
+
+            setOrientation(_orientationMirrorHoriz, _orientationMirrorVert, _orientationRotateQuadrant);
+        }
+
+        /**
+         * Get the rotation of the panel
+         * @return The number of 90 degree arcs to rotate by. Only 0, 1, 2 and 3 are allowed
+         */
+        public int getRotation() {
+            return _orientationRotateQuadrant;
+        }
+
+        /**
+         * Set the horizontal mirroring of the panel
+         * @param mirror True if mirror horizontal
+         */
+        public void setMirrorHoriz(boolean mirror) {
+            _orientationMirrorHoriz = mirror;
+
+            setOrientation(_orientationMirrorHoriz, _orientationMirrorVert, _orientationRotateQuadrant);
+        }
+
+        /**
+         * Get the horizontal mirroring of the panel
+         * @return True if mirror horizontal
+         */
+        public boolean getMirrorHoriz() {
+            return _orientationMirrorHoriz;
+        }
+
+        /**
+         * Set the vertical mirroring of the panel
+         * @param mirror True if mirror vertical
+         */
+        public void setMirrorVert(boolean mirror) {
+            _orientationMirrorVert = mirror;
+
+            setOrientation(_orientationMirrorHoriz, _orientationMirrorVert, _orientationRotateQuadrant);
+        }
+
+        /**
+         * Get the vertical mirroring of the panel
+         * @return True if mirror horizontal
+         */
+        public boolean getMirrorVert() {
+            return _orientationMirrorVert;
+        }
+
+        /**
+         * Set the enabled flag for an entire tree of components
+         * @param c The parent component of the tree
+         * @param enable If true, this component is enabled; otherwise this component is disabled
+         */
+        private void componentSetEnabledRecursive(Container c, boolean enable) {
+            c.setEnabled(enable);
+            for (Component child : c.getComponents()) {
+                child.setEnabled(enable);
+                if(child instanceof Container) {
+                    componentSetEnabledRecursive((Container)child, enable);
+                }
+            }
+        }
+        
+        
+        /**
+         * Set the orientation of the pane.
+         * @param mirrorHoriz Should the pane be mirrored horizontal?
+         * @param mirrorVert Should the pane be mirrored vertical?
+         * @param rotateQuadrant The number of 90 degree arcs to rotate by. Only 0, 1, 2 and 3 are allowed
+         * throws IllegalArgumentException
+         */
+        public void setOrientation(boolean mirrorHoriz, boolean mirrorVert, int rotateQuadrant) {
+            if ( (rotateQuadrant < 0) || (rotateQuadrant > 3) )
+                throw new IllegalArgumentException("rotateNumQuadrants must be 0, 1, 2 or 3");
+
+            _orientationMirrorHoriz = mirrorHoriz;
+            _orientationMirrorVert = mirrorVert;
+            _orientationRotateQuadrant = rotateQuadrant;
+
+            int minWidth = 0;
+            int minHeight = 0;
+
+            for (Component c : this.getComponents()) {
+                if (minWidth < c.getX() + c.getWidth())
+                    minWidth = c.getX() + c.getWidth();
+
+                if (minHeight < c.getY() + c.getHeight())
+                    minHeight = c.getY() + c.getHeight();
+            }
+
+            // Do we rotate the panel 90 degrees or 270 degrees?
+            if ((_orientationRotateQuadrant == 1) || (_orientationRotateQuadrant == 3)) {
+                int swap = minWidth;
+                minWidth = minHeight;
+                minHeight = swap;
+            }
+
+            if (w < minWidth)
+                w = minWidth;
+
+            if (h < minHeight)
+                h = minHeight;
+
+            setScrollbarScale(1.0);     // Update the panel size and the scrollbars
+
+            boolean canEdit = (_orientationRotateQuadrant == 0) && !_orientationMirrorHoriz && !_orientationMirrorVert;
+            componentSetEnabledRecursive(Editor.this, canEdit);
+        }
+
+        /**
+         * Update the transform matrix used to mirror and/or rotate the pane.
+         * This method needs to be called then the pane is resized.
+         */
+        protected void updateTransform() {
+            double centerX = w/2;
+            double centerY = h/2;
+
+            // Clear the transform matrix, i.e. set it to the identity matrix
+            transform.setToIdentity();
+
+            // Move origo to the center of the pane since we have rotated
+            // the pane to origo.
+            // It's important to think backwards here. It's the last added
+            // transform that will take effect first.
+            transform.translate(centerX, centerY);
+            if (_orientationMirrorHoriz) {
+                transform.scale(1, -1);
+            }
+            if (_orientationMirrorVert) {
+                transform.scale(-1, 1);
+            }
+            transform.concatenate(AffineTransform.getQuadrantRotateInstance(_orientationRotateQuadrant));
+
+            // Move center of the pane to origo since we want to rotate
+            // the pane around the center of the pane
+            // Do we rotate the panel 0 degrees or 180 degrees?
+            if ((_orientationRotateQuadrant == 0) || (_orientationRotateQuadrant == 2))
+                transform.translate(-centerX, -centerY);
+            else
+                transform.translate(-centerY, -centerX);
+
+            // Calculate the inverse transform matrix.
+            // It is used to transform mouse coordinates.
+            inverseTransform.setTransform(transform);
+            try {
+                inverseTransform.invert();
+            } catch (NoninvertibleTransformException ex) {
+                // This shouldn't be possible since we only mirror and/or rotate.
+                throw new RuntimeException("transform cannot be inverted");
+            }
+
+            this.repaint();
+        }
+
+        private MouseEvent transformMouseEvent(MouseEvent e) {
+            int offsetX = e.getXOnScreen() - e.getX();
+            int offsetY = e.getYOnScreen() - e.getY();
+            Point2D p = new Point2D.Float(e.getX(),e.getY());
+            p = inverseTransform.transform(p, null);
+            MouseEvent evt = new MouseEvent(
+                                    (Component)e.getSource(),
+                                    e.getID(),
+                                    e.getWhen(),
+                                    e.getModifiersEx(),
+                                    (int)Math.round(p.getX()),
+                                    (int)Math.round(p.getY()),
+                                    (int)Math.round(p.getX())+offsetX,
+                                    (int)Math.round(p.getX())+offsetY,
+                                    e.getClickCount(),
+                                    e.isPopupTrigger(),
+                                    e.getButton());
+            return evt;
         }
 
         @Override
         public void setSize(int width, int height) {
 //            log.debug("size now w={}, h={}", width, height);
+
             this.h = height;
             this.w = width;
+
             super.setSize(width, height);
+
+            updateTransform();
         }
 
         @Override
@@ -635,9 +839,16 @@ abstract public class Editor extends JmriJFrame implements MouseListener, MouseM
         @Override
         public void paint(Graphics g) {
             Graphics2D g2d = null;
+            AffineTransform saveTransform = null;
             if (g instanceof Graphics2D) {
                 g2d = (Graphics2D) g;
                 g2d.scale(_paintScale, _paintScale);                
+
+                // Save current transform
+                saveTransform = g2d.getTransform();
+                
+                // Mirror and/or rotate if desired
+                g2d.transform(transform);
             }
 
             super.paint(g);
@@ -686,6 +897,10 @@ abstract public class Editor extends JmriJFrame implements MouseListener, MouseM
             if (_tooltip != null) {
                 _tooltip.paint(g2d, _paintScale);
             }
+
+            // Restore saved transform if we changed it
+            if ((g2d != null) && (saveTransform != null))
+                g2d.setTransform(transform);
         }
 
         public void setBackgroundColor(Color col) {
@@ -824,6 +1039,9 @@ abstract public class Editor extends JmriJFrame implements MouseListener, MouseM
     /**
      * Control whether panel items can be positioned. Markers can always be
      * positioned.
+     * 
+     * This is overridden if the TargetPanel is rotated and/or mirrored.
+     * In that case, no movement is allowed.
      *
      * @param state true to set all items positionable; false otherwise
      */
@@ -3387,6 +3605,65 @@ abstract public class Editor extends JmriJFrame implements MouseListener, MouseM
             }
         }
         return null;
+    }
+
+    /**
+     * Special internal class to transform mouse event coordinates
+     */
+    private class EditorMouseListener implements MouseListener {
+
+        private final Editor editor;
+
+        private EditorMouseListener(Editor editor) {
+            this.editor = editor;
+        }
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            editor.mouseClicked(_targetPanel.transformMouseEvent(e));
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            editor.mousePressed(_targetPanel.transformMouseEvent(e));
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            editor.mouseReleased(_targetPanel.transformMouseEvent(e));
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            editor.mouseEntered(_targetPanel.transformMouseEvent(e));
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            editor.mouseExited(_targetPanel.transformMouseEvent(e));
+        }
+    }
+
+    /**
+     * Special internal class to transform mouse event coordinates
+     */
+    private class EditorMouseMotionListener implements MouseMotionListener {
+
+        private final Editor editor;
+
+        private EditorMouseMotionListener(Editor editor) {
+            this.editor = editor;
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            editor.mouseDragged(_targetPanel.transformMouseEvent(e));
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+            editor.mouseMoved(_targetPanel.transformMouseEvent(e));
+        }
     }
 
     // initialize logging

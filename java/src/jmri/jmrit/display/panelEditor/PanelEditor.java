@@ -109,6 +109,14 @@ public class PanelEditor extends Editor implements ItemListener {
     private JTextField nextLabel = new JTextField(10);
 
     private JComboBox<ComboBoxItem> _addIconBox;
+    
+    // Menu items for orientation
+    JCheckBoxMenuItem menuItemNoRotation;
+    JCheckBoxMenuItem menuItemRotate90deg;
+    JCheckBoxMenuItem menuItemRotate180deg;
+    JCheckBoxMenuItem menuItemRotate270deg;
+    JCheckBoxMenuItem menuItemMirrorHoriz;
+    JCheckBoxMenuItem menuItemMirrorVert;
 
     public PanelEditor() {
     }
@@ -533,6 +541,46 @@ public class PanelEditor extends Editor implements ItemListener {
         setVisible(false);
     }
 
+    private void rotateTargetPanel(int quadrant) {
+
+        menuItemNoRotation.setSelected(false);
+        menuItemRotate90deg.setSelected(false);
+        menuItemRotate180deg.setSelected(false);
+        menuItemRotate270deg.setSelected(false);
+        
+        switch (quadrant) {
+            case 0:
+                menuItemNoRotation.setSelected(true);
+                break;
+
+            case 1:
+                menuItemRotate90deg.setSelected(true);
+                break;
+
+            case 2:
+                menuItemRotate180deg.setSelected(true);
+                break;
+
+            case 3:
+                menuItemRotate270deg.setSelected(true);
+                break;
+
+            default:
+                log.error("quadrant is not 0 <= x <= 3");
+        }
+
+        _targetPanel.setRotation(quadrant);
+    }
+    
+    public void setTargetPanelOrientation(boolean mirrorHoriz, boolean mirrorVert, int rotateQuadrant) {
+        _targetPanel.setOrientation(mirrorHoriz, mirrorVert, rotateQuadrant);
+        
+        // Update which menu items are selected
+        rotateTargetPanel(rotateQuadrant);
+        menuItemMirrorHoriz.setSelected(mirrorHoriz);
+        menuItemMirrorVert.setSelected(mirrorVert);
+    }
+
     /**
      * Create sequence of panels, etc, for layout: JFrame contains its
      * ContentPane which contains a JPanel with BoxLayout (p1) which contains a
@@ -553,6 +601,49 @@ public class PanelEditor extends Editor implements ItemListener {
             }
         });
         editMenu.addSeparator();
+
+        JMenu orientationMenu = new JMenu(Bundle.getMessage("Orientation"));
+        editMenu.add(orientationMenu);
+        menuItemNoRotation = new JCheckBoxMenuItem(Bundle.getMessage("MenuItemNoRotation"));
+        menuItemNoRotation.setSelected(true);       // Rotation 0 degrees is the default
+        menuItemNoRotation.addActionListener((ActionEvent e) -> {
+            rotateTargetPanel(0);
+        });
+        orientationMenu.add(menuItemNoRotation);
+
+        menuItemRotate90deg = new JCheckBoxMenuItem(Bundle.getMessage("MenuItemRotate90Deg"));
+        menuItemRotate90deg.addActionListener((ActionEvent e) -> {
+            rotateTargetPanel(1);
+        });
+        orientationMenu.add(menuItemRotate90deg);
+
+        menuItemRotate180deg = new JCheckBoxMenuItem(Bundle.getMessage("MenuItemRotate180Deg"));
+        menuItemRotate180deg.addActionListener((ActionEvent e) -> {
+            rotateTargetPanel(2);
+        });
+        orientationMenu.add(menuItemRotate180deg);
+
+        menuItemRotate270deg = new JCheckBoxMenuItem(Bundle.getMessage("MenuItemRotate270Deg"));
+        menuItemRotate270deg.addActionListener((ActionEvent e) -> {
+            rotateTargetPanel(3);
+        });
+        orientationMenu.add(menuItemRotate270deg);
+
+        orientationMenu.addSeparator();
+
+        menuItemMirrorHoriz = new JCheckBoxMenuItem(Bundle.getMessage("MenuItemMirrorHoriz"));
+        menuItemMirrorHoriz.addActionListener((ActionEvent e) -> {
+            _targetPanel.setMirrorHoriz(menuItemMirrorHoriz.isSelected());
+        });
+        orientationMenu.add(menuItemMirrorHoriz);
+
+        menuItemMirrorVert = new JCheckBoxMenuItem(Bundle.getMessage("MenuItemMirrorVert"));
+        menuItemMirrorVert.addActionListener((ActionEvent e) -> {
+            _targetPanel.setMirrorVert(menuItemMirrorVert.isSelected());
+        });
+        orientationMenu.add(menuItemMirrorVert);
+
+        editMenu.addSeparator();
         editMenu.add(new AbstractAction(Bundle.getMessage("DeletePanel")) {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -562,6 +653,7 @@ public class PanelEditor extends Editor implements ItemListener {
             }
         });
         targetFrame.setJMenuBar(menuBar);
+
         // add maker menu
         JMenu markerMenu = new JMenu(Bundle.getMessage("MenuMarker"));
         menuBar.add(markerMenu);
@@ -863,7 +955,7 @@ public class PanelEditor extends Editor implements ItemListener {
             return;
         }
         moveIt:
-        if (_currentSelection != null && getFlag(OPTION_POSITION, _currentSelection.isPositionable())) {
+        if (_currentSelection != null && getFlag(OPTION_POSITION, _currentSelection.isPositionable()) && _targetPanel.allowChildMovement()) {
             int deltaX = event.getX() - _lastX;
             int deltaY = event.getY() - _lastY;
             int minX = getItemX(_currentSelection, deltaX);
