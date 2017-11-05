@@ -5,6 +5,7 @@ import static java.lang.Integer.parseInt;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
@@ -678,7 +679,6 @@ public class LayoutSlip extends LayoutTurnout {
     }
 
     JPopupMenu popup = null;
-    LayoutEditorTools tools = null;
 
     /**
      * {@inheritDoc}
@@ -691,7 +691,6 @@ public class LayoutSlip extends LayoutTurnout {
         } else {
             popup = new JPopupMenu();
         }
-        tools = layoutEditor.getLETools();
         if (layoutEditor.isEditable()) {
             String slipStateString = getSlipStateString(getSlipState());
             slipStateString = String.format(" (%s)", slipStateString);
@@ -735,61 +734,81 @@ public class LayoutSlip extends LayoutTurnout {
             boolean blockAssigned = false;
             if ((blockName == null) || (blockName.isEmpty())) {
                 jmi = popup.add(Bundle.getMessage("NoBlock"));
+                jmi.setEnabled(false);
             } else {
                 jmi = popup.add(Bundle.getMessage("MakeLabel", Bundle.getMessage("BeanNameBlock")) + getLayoutBlock().getDisplayName());
+                jmi.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent event) {
+                            layoutEditor.highlightLayoutBlock(getLayoutBlock());
+                    } //actionPerformed
+                });
                 blockAssigned = true;
             }
-            jmi.setEnabled(false);
 
             // if there are any track connections
             if ((connectA != null) || (connectB != null)
                     || (connectC != null) || (connectD != null)) {
-                JMenu connectionsMenu = new JMenu(Bundle.getMessage("Connections")); // there is no pane opening (which is what ... implies)
+                popup.add(new JSeparator(JSeparator.HORIZONTAL));
+                jmi = popup.add(new JMenuItem(Bundle.getMessage("Connections"))); // there is no pane opening (which is what ... implies)
+                popup.add(jmi);
+                jmi.setEnabled(false);
                 if (connectA != null) {
-                    connectionsMenu.add(new AbstractAction(Bundle.getMessage("MakeLabel", "A") + connectA.getName()) {
+                    popup.add(new AbstractAction(Bundle.getMessage("MakeLabel", "A") + connectA.getName()) {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             LayoutEditorFindItems lf = layoutEditor.getFinder();
                             LayoutTrack lt = lf.findObjectByName(connectA.getName());
-                            layoutEditor.setSelectionRect(lt.getBounds());
-                            lt.showPopup();
+                            // this shouldn't ever be null... however...
+                            if (lt != null) {
+                                layoutEditor.setSelectionRect(lt.getBounds());
+                                lt.showPopup();
+                            }
                         }
                     });
                 }
                 if (connectB != null) {
-                    connectionsMenu.add(new AbstractAction(Bundle.getMessage("MakeLabel", "B") + connectB.getName()) {
+                    popup.add(new AbstractAction(Bundle.getMessage("MakeLabel", "B") + connectB.getName()) {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             LayoutEditorFindItems lf = layoutEditor.getFinder();
                             LayoutTrack lt = lf.findObjectByName(connectB.getName());
-                            layoutEditor.setSelectionRect(lt.getBounds());
-                            lt.showPopup();
+                            // this shouldn't ever be null... however...
+                            if (lt != null) {
+                                layoutEditor.setSelectionRect(lt.getBounds());
+                                lt.showPopup();
+                            }
                         }
                     });
                 }
                 if (connectC != null) {
-                    connectionsMenu.add(new AbstractAction(Bundle.getMessage("MakeLabel", "C") + connectC.getName()) {
+                    popup.add(new AbstractAction(Bundle.getMessage("MakeLabel", "C") + connectC.getName()) {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             LayoutEditorFindItems lf = layoutEditor.getFinder();
                             LayoutTrack lt = lf.findObjectByName(connectC.getName());
-                            layoutEditor.setSelectionRect(lt.getBounds());
-                            lt.showPopup();
+                            // this shouldn't ever be null... however...
+                            if (lt != null) {
+                                layoutEditor.setSelectionRect(lt.getBounds());
+                                lt.showPopup();
+                            }
                         }
                     });
                 }
                 if (connectD != null) {
-                    connectionsMenu.add(new AbstractAction(Bundle.getMessage("MakeLabel", "D") + connectD.getName()) {
+                    popup.add(new AbstractAction(Bundle.getMessage("MakeLabel", "D") + connectD.getName()) {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             LayoutEditorFindItems lf = layoutEditor.getFinder();
                             LayoutTrack lt = lf.findObjectByName(connectD.getName());
-                            layoutEditor.setSelectionRect(lt.getBounds());
-                            lt.showPopup();
+                            // this shouldn't ever be null... however...
+                            if (lt != null) {
+                                layoutEditor.setSelectionRect(lt.getBounds());
+                                lt.showPopup();
+                            }
                         }
                     });
                 }
-                popup.add(connectionsMenu);
             }
 
             popup.add(new JSeparator(JSeparator.HORIZONTAL));
@@ -875,12 +894,15 @@ public class LayoutSlip extends LayoutTurnout {
                 AbstractAction ssaa = new AbstractAction(Bundle.getMessage("SetSignals")) {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        tools.setSignalsAtSlipFromMenu(LayoutSlip.this,
-                                layoutEditor.signalIconEditor, layoutEditor.signalFrame);
+                        layoutEditor.getLETools().setSignalsAtSlipFromMenu(
+                                LayoutSlip.this,
+                                layoutEditor.signalIconEditor,
+                                layoutEditor.signalFrame);
                     }
                 };
                 JMenu jm = new JMenu(Bundle.getMessage("SignalHeads"));
-                if (tools.addLayoutSlipSignalHeadInfoToMenu(LayoutSlip.this, jm)) {
+                if (layoutEditor.getLETools().addLayoutSlipSignalHeadInfoToMenu(
+                        LayoutSlip.this, jm)) {
                     jm.add(ssaa);
                     popup.add(jm);
                 } else {
@@ -901,13 +923,19 @@ public class LayoutSlip extends LayoutTurnout {
                 popup.add(new AbstractAction(Bundle.getMessage("SetSignalMasts")) {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        tools.setSignalMastsAtSlipFromMenu(LayoutSlip.this, boundaryBetween, layoutEditor.signalFrame);
+                        layoutEditor.getLETools().setSignalMastsAtSlipFromMenu(
+                                LayoutSlip.this,
+                                boundaryBetween,
+                                layoutEditor.signalFrame);
                     }
                 });
                 popup.add(new AbstractAction(Bundle.getMessage("SetSensors")) {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        tools.setSensorsAtSlipFromMenu(LayoutSlip.this, boundaryBetween, layoutEditor.sensorIconEditor, layoutEditor.sensorFrame);
+                        layoutEditor.getLETools().setSensorsAtSlipFromMenu(
+                                LayoutSlip.this, boundaryBetween,
+                                layoutEditor.sensorIconEditor,
+                                layoutEditor.sensorFrame);
                     }
                 });
             }

@@ -4,29 +4,31 @@ import java.util.ResourceBundle;
 import javax.swing.JMenu;
 
 /**
- * Create a "Systems" menu containing the Jmri EasyDCC-specific tools
+ * Create a "Systems" menu containing the Jmri EasyDCC-specific tools.
  *
  * @author Bob Jacobsen Copyright 2003
  */
-public class EasyDCCMenu extends JMenu {
+public class EasyDccMenu extends JMenu {
 
-    public EasyDCCMenu(String name) {
-        this();
+    public EasyDccMenu(String name, EasyDccSystemConnectionMemo memo) {
+        this(memo);
         setText(name);
     }
 
-    public EasyDCCMenu() {
-
+    public EasyDccMenu(EasyDccSystemConnectionMemo memo) {
         super();
+        if (memo != null) {
+            setText(memo.getUserName());
+        } else {
+            setText(Bundle.getMessage("MenuEasyDCC"));
+        }
 
-        ResourceBundle rb = ResourceBundle.getBundle("jmri.jmrix.JmrixSystemsBundle");
-
-        // setText(rb.getString("MenuSystems"));
-        setText(rb.getString("MenuItemEasyDCC"));
-
-        add(new jmri.jmrix.easydcc.easydccmon.EasyDccMonAction(rb.getString("MenuItemCommandMonitor")));
-        add(new jmri.jmrix.easydcc.packetgen.EasyDccPacketGenAction(rb.getString("MenuItemSendCommand")));
-
+        if (memo != null) {
+            // do we have an EasyDccTrafficController?
+            setEnabled(memo.getTrafficController() != null); // disable menu, no connection, no tools!
+            add(new jmri.jmrix.easydcc.easydccmon.EasyDccMonAction(Bundle.getMessage("MonitorXTitle", "EasyDCC"), memo));
+            add(new jmri.jmrix.easydcc.packetgen.EasyDccPacketGenAction(Bundle.getMessage("MenuItemSendCommand"), memo));
+        }
     }
 
 }

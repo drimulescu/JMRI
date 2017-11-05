@@ -1,10 +1,13 @@
 package jmri.jmrit.display.layoutEditor;
 
+import static jmri.jmrit.display.layoutEditor.LayoutTrack.TRACK;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Line2D;
@@ -57,10 +60,10 @@ public class TrackSegment extends LayoutTrack {
 
     // persistent instances variables (saved between sessions)
     private String blockName = "";
-    private LayoutTrack connect1 = null;
-    private int type1 = 0;
-    private LayoutTrack connect2 = null;
-    private int type2 = 0;
+    protected LayoutTrack connect1 = null;
+    protected int type1 = 0;
+    protected LayoutTrack connect2 = null;
+    protected int type2 = 0;
     private boolean dashed = false;
     private boolean mainline = false;
     private boolean arc = false;
@@ -181,6 +184,53 @@ public class TrackSegment extends LayoutTrack {
     protected void setNewConnect2(@Nullable LayoutTrack connectTrack, int connectionType) {
         connect2 = connectTrack;
         type2 = connectionType;
+    }
+
+    /**
+     * replace old track connection with new track connection
+     *
+     * @param oldTrack the old track connection
+     * @param newTrack the new track connection
+     * @return true if successful
+     */
+    public boolean replaceTrackConnection(@Nullable LayoutTrack oldTrack, @Nullable LayoutTrack newTrack, int newType) {
+        boolean result = false; // assume failure (pessimist!)
+        // trying to replace old track with null?
+        if (newTrack == null) {
+            // (yes) remove old connection
+            if (oldTrack != null) {
+                result = true;  // assume success (optimist!)
+                if (connect1 == oldTrack) {
+                    connect1 = null;
+                    type1 = NONE;
+                } else if (connect2 == oldTrack) {
+                    connect2 = null;
+                    type2 = NONE;
+                } else {
+                    result = false; // didn't find old connection
+                }
+            } else {
+                result = false; // can't replace null with null
+            }
+            if (!result) {
+                log.error("Attempt to remove non-existant track connection");
+            }
+        } else // already connected to newTrack?
+        if ((connect1 != newTrack) && (connect2 != newTrack)) {
+            // (no) find a connection we can connect to
+            result = true;  // assume success (optimist!)
+            if (connect1 == oldTrack) {
+                connect1 = newTrack;
+                type1 = newType;
+            } else if (connect2 == oldTrack) {
+                connect2 = newTrack;
+                type2 = newType;
+            } else {
+                log.error("Attempt to replace invalid connection");
+                result = false;
+            }
+        }
+        return result;
     }
 
     /**
@@ -674,37 +724,51 @@ public class TrackSegment extends LayoutTrack {
 
         if (blockName.isEmpty()) {
             jmi = popup.add(Bundle.getMessage("NoBlock"));
+            jmi.setEnabled(false);
         } else {
             jmi = popup.add(Bundle.getMessage("MakeLabel", Bundle.getMessage("BeanNameBlock")) + getLayoutBlock().getDisplayName());
+            jmi.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    layoutEditor.highlightLayoutBlock(getLayoutBlock());
+                } //actionPerformed
+            });
         }
-        jmi.setEnabled(false);
 
         // if there are any track connections
         if ((connect1 != null) || (connect2 != null)) {
-            JMenu connectionsMenu = new JMenu(Bundle.getMessage("Connections")); // there is no pane opening (which is what ... implies)
+            popup.add(new JSeparator(JSeparator.HORIZONTAL));
+            jmi = popup.add(new JMenuItem(Bundle.getMessage("Connections"))); // there is no pane opening (which is what ... implies)
+            popup.add(jmi);
+            jmi.setEnabled(false);
             if (connect1 != null) {
-                connectionsMenu.add(new AbstractAction(Bundle.getMessage("MakeLabel", "1") + connect1.getName()) {
+                popup.add(new AbstractAction(Bundle.getMessage("MakeLabel", "1") + connect1.getName()) {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         LayoutEditorFindItems lf = layoutEditor.getFinder();
                         LayoutTrack lt = lf.findObjectByName(connect1.getName());
-                        layoutEditor.setSelectionRect(lt.getBounds());
-                        lt.showPopup();
+                        // this shouldn't ever be null... however...
+                        if (lt != null) {
+                            layoutEditor.setSelectionRect(lt.getBounds());
+                            lt.showPopup();
+                        }
                     }
                 });
             }
             if (connect2 != null) {
-                connectionsMenu.add(new AbstractAction(Bundle.getMessage("MakeLabel", "2") + connect2.getName()) {
+                popup.add(new AbstractAction(Bundle.getMessage("MakeLabel", "2") + connect2.getName()) {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         LayoutEditorFindItems lf = layoutEditor.getFinder();
                         LayoutTrack lt = lf.findObjectByName(connect2.getName());
-                        layoutEditor.setSelectionRect(lt.getBounds());
-                        lt.showPopup();
+                        // this shouldn't ever be null... however...
+                        if (lt != null) {
+                            layoutEditor.setSelectionRect(lt.getBounds());
+                            lt.showPopup();
+                        }
                     }
                 });
             }
-            popup.add(connectionsMenu);
         }
 
         popup.add(new JSeparator(JSeparator.HORIZONTAL));
@@ -741,6 +805,12 @@ public class TrackSegment extends LayoutTrack {
                 remove();
                 dispose();
             }
+        });
+        popup.add(new AbstractAction(Bundle.getMessage("SplitTrackSegment")) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                splitTrackSegment();
+            };
         });
 
         JMenu lineType = new JMenu(Bundle.getMessage("ChangeTo"));
@@ -815,6 +885,62 @@ public class TrackSegment extends LayoutTrack {
         popup.show(mouseEvent.getComponent(), mouseEvent.getX(), mouseEvent.getY());
         return popup;
     }   // showPopup
+
+    /**
+     * split this TrackSegment
+     */
+    private void splitTrackSegment() {
+        // create a new anchor
+        Point2D p = getCentreSeg();
+        PositionablePoint newAnchor = layoutEditor.addAnchor(p);
+        // link it to me
+        layoutEditor.setLink(newAnchor, POS_POINT, this, TRACK);
+
+        //get unique name for a new track segment
+        String name = layoutEditor.getFinder().uniqueName("T", 0);
+
+        //create it between the new anchor and my connect2(/type2)
+        TrackSegment newTrackSegment = new TrackSegment(name,
+                newAnchor, POS_POINT,
+                connect2, type2,
+                isDashed(), isMainline(), layoutEditor);
+        // add it to known tracks
+        layoutEditor.getLayoutTracks().add(newTrackSegment);
+        layoutEditor.setDirty();
+
+        // copy attributes to new track segment
+        newTrackSegment.setLayoutBlock(this.getLayoutBlock());
+        newTrackSegment.setArc(this.isArc());
+        newTrackSegment.setCircle(this.isCircle());
+        //newTrackSegment.setBezier(this.isBezier());
+        newTrackSegment.setFlip(this.isFlip());
+
+        // link my connect2 to the new track segment
+        if (connect2 instanceof PositionablePoint) {
+            PositionablePoint pp = (PositionablePoint) connect2;
+            pp.replaceTrackConnection(this, newTrackSegment);
+        } else {
+            layoutEditor.setLink(connect2, type2, newTrackSegment, TRACK);
+        }
+
+        // link the new anchor to the new track segment
+        layoutEditor.setLink(newAnchor, POS_POINT, newTrackSegment, TRACK);
+
+        // link me to the new newAnchor
+        connect2 = newAnchor;
+        type2 = POS_POINT;
+
+        //check on layout block
+        LayoutBlock b = this.getLayoutBlock();
+
+        if (b != null) {
+            newTrackSegment.setLayoutBlock(b);
+            layoutEditor.getLEAuxTools().setBlockConnectivityChanged();
+            newTrackSegment.updateBlockInfo();
+        }
+        layoutEditor.setDirty();
+        layoutEditor.redrawPanel();
+    }
 
     /**
      * Display popup menu for information and editing.
@@ -1696,7 +1822,7 @@ public class TrackSegment extends LayoutTrack {
                     }
                 }
             } else {    // (#3)
-                log.info("•New block ('{}') trackNameSets", blockName);
+                log.info("-New block ('{}') trackNameSets", blockName);
                 TrackNameSets = new ArrayList<>();
                 blockNamesToTrackNameSetsMap.put(blockName, TrackNameSets);
             }
@@ -1705,7 +1831,7 @@ public class TrackSegment extends LayoutTrack {
                 TrackNameSets.add(TrackNameSet);
             }
             if (TrackNameSet.add(getName())) {
-                log.info("•    Add track '{}' to TrackNameSets for block '{}'", getName(), blockName);
+                log.info("-    Add track '{}' to TrackNameSets for block '{}'", getName(), blockName);
             }
             // (#4)
             if (connect1 != null) {
@@ -1727,7 +1853,7 @@ public class TrackSegment extends LayoutTrack {
             if (this.blockName.equals(blockName)) {
                 // if we are added to the TrackNameSet
                 if (TrackNameSet.add(getName())) {
-                    log.info("•    Add track '{}'for block '{}'", getName(), blockName);
+                    log.info("-    Add track '{}' for block '{}'", getName(), blockName);
                 }
                 // these should never be null... but just in case...
                 // it's time to play... flood your neighbours!
@@ -1739,6 +1865,13 @@ public class TrackSegment extends LayoutTrack {
                 }
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setAllLayoutBlocks(LayoutBlock layoutBlock) {
+        setLayoutBlock(layoutBlock);
     }
 
     private final static Logger log = LoggerFactory.getLogger(TrackSegment.class
