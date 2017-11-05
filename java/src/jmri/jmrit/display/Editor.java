@@ -1399,7 +1399,7 @@ abstract public class Editor extends JmriJFrame implements MouseListener, MouseM
         } else {
             edit = new JMenuItem(Bundle.getMessage(
                 "EditLocationXY", p.getX(), p.getY()));
-            edit.addActionListener(CoordinateEdit.getCoordinateEditAction(p)); 
+            edit.addActionListener(CoordinateEdit.getCoordinateEditAction(p));
         }
         popup.add(edit);
         return true;
