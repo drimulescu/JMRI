@@ -352,16 +352,13 @@ public class SRCPTrafficController extends AbstractMRTrafficController
 
     /**
      * Take the necessary action.
-     *
-     * @return true if the shutdown should continue, false to abort.
      */
     @Override
-    public boolean execute() {
+    public void execute() {
         // notify the server we are exiting.
         sendSRCPMessage(new SRCPMessage("TERM 0 SESSION"), null);
         // the server will send a reply of "101 INFO 0 SESSION <id>.
         // but we aren't going to wait for the reply.
-        return true;
     }
 
     @Override

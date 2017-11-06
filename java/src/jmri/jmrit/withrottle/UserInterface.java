@@ -365,9 +365,8 @@ public class UserInterface extends JmriJFrame implements DeviceListener, DeviceM
         if (jmri.InstanceManager.getNullableDefault(jmri.ShutDownManager.class) != null) {
             task = new jmri.implementation.AbstractShutDownTask(getTitle()) {
                 @Override
-                public boolean execute() {
+                public void execute() {
                     disableServer();
-                    return true;
                 }
             };
             jmri.InstanceManager.getDefault(jmri.ShutDownManager.class).register(task);

@@ -34,9 +34,8 @@ public class Dcc4PcSensorManager extends jmri.managers.AbstractSensorManager
         // Finally, create and register a shutdown task to ensure clean exit
         this.pollShutDownTask = new QuietShutDownTask("DCC4PC Board Poll Shutdown") {
             @Override
-            public boolean execute() {
+            public void execute() {
                 stopPolling();
-                return true;
             }
         };
         startPolling();

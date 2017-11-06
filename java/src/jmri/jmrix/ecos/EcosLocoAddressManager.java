@@ -223,8 +223,8 @@ public class EcosLocoAddressManager extends jmri.managers.AbstractManager implem
         if (ecosLocoShutDownTask == null) {
             ecosLocoShutDownTask = new QuietShutDownTask("Ecos Loco Database Shutdown") {
                 @Override
-                public boolean execute() {
-                    return shutdownDispose();
+                public void execute() {
+                    shutdownDispose();
                 }
             };
         }
@@ -306,7 +306,7 @@ public class EcosLocoAddressManager extends jmri.managers.AbstractManager implem
     public void dispose() {
     }
 
-    public boolean shutdownDispose() {
+    public void shutdownDispose() {
         boolean hasTempEntries = false;
         Enumeration<String> en = _tecos.keys();
         _tdcc.clear();
@@ -383,7 +383,6 @@ public class EcosLocoAddressManager extends jmri.managers.AbstractManager implem
             dialog.setModal(true);
             dialog.setVisible(true);
         }
-        return true;
     }
 
     java.beans.PropertyChangeSupport pcs = new java.beans.PropertyChangeSupport(this);

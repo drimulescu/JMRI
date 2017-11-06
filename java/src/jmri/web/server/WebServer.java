@@ -460,7 +460,7 @@ public final class WebServer implements LifeCycle, LifeCycle.Listener {
         }
 
         @Override
-        public boolean execute() {
+        public void execute() {
             Thread t = new Thread(() -> {
                 try {
                     server.stop();
@@ -474,7 +474,6 @@ public final class WebServer implements LifeCycle, LifeCycle.Listener {
             });
             t.setName("ServerShutDownTask");
             t.start();
-            return true;
         }
 
         @Override

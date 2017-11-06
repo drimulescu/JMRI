@@ -555,7 +555,7 @@ public class ZeroConfService {
         }
 
         @Override
-        public boolean execute() {
+        public void execute() {
             new Thread(() -> {
                 Date start = new Date();
                 log.debug("Starting to stop services...");
@@ -566,7 +566,6 @@ public class ZeroConfService {
                 log.debug("Removed network topology listener in {} milliseconds", new Date().getTime() - start.getTime());
                 this.isComplete = true;
             }).start();
-            return true;
         }
 
         @Override

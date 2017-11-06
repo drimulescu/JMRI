@@ -84,7 +84,7 @@ public class PR3SystemConnectionMemo extends LocoNetSystemConnectionMemo {
         if (restoreToLocoNetInterfaceModeTask == null) {
             restoreToLocoNetInterfaceModeTask = new QuietShutDownTask("Restore PR3 to LocoNet Interface Mode") {    // NOI18N
                 @Override
-                public boolean execute() {
+                public void execute() {
 
                     if (mode == PR3MODE) {
                         // try to change from "standalone programmer" to "LocoNet interface" mode
@@ -101,7 +101,6 @@ public class PR3SystemConnectionMemo extends LocoNetSystemConnectionMemo {
                             log.info("Configuring PR3 for 'LocoNet Interface' mode"); // NOI18N
                         }
                     }
-                    return true;
                 }
             };
             if (InstanceManager.getNullableDefault(jmri.ShutDownManager.class) != null) {

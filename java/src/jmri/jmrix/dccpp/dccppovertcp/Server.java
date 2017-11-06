@@ -164,9 +164,8 @@ public class Server {
             if (this.shutDownTask == null) {
                 this.shutDownTask = new QuietShutDownTask("DCCppOverTcpServer") {
                     @Override
-                    public boolean execute() {
+                    public void execute() {
                         InstanceManager.getDefault(Server.class).disable();
-                        return true;
                     }
                 };
             }

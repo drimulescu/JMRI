@@ -113,14 +113,13 @@ public final class OperationsManager implements InstanceManagerAutoDefault, Inst
     public ShutDownTask getDefaultShutDownTask() {
         return new QuietShutDownTask("Save Operations State") { // NOI18N
             @Override
-            public boolean execute() {
+            public void execute() {
                 try {
                     OperationsXml.save();
                 } catch (Exception ex) {
                     log.warn("Error saving operations state: {}", ex.getMessage());
                     log.debug("Details follow: ", ex);
                 }
-                return true;
             }
         };
     }

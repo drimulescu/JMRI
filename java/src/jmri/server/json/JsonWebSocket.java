@@ -37,14 +37,13 @@ public class JsonWebSocket {
             this.handler = new JsonClientHandler(this.connection);
             this.shutDownTask = new QuietShutDownTask("Close open web socket") { // NOI18N
                 @Override
-                public boolean execute() {
+                public void execute() {
                     try {
                         JsonWebSocket.this.getConnection().sendMessage(JsonWebSocket.this.getConnection().getObjectMapper().createObjectNode().put(JSON.TYPE, JSON.GOODBYE));
                     } catch (IOException e) {
                         log.warn("Unable to send goodbye while closing socket.\nError was {}", e.getMessage());
                     }
                     JsonWebSocket.this.getConnection().getSession().close();
-                    return true;
                 }
             };
             log.debug("Sending hello");

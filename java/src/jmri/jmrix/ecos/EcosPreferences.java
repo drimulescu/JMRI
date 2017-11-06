@@ -22,11 +22,10 @@ public class EcosPreferences /*implements java.beans.PropertyChangeListener*/ {
 
         ecosPreferencesShutDownTask = new QuietShutDownTask("Ecos Preferences Shutdown") {
             @Override
-            public boolean execute() {
+            public void execute() {
                 if (getChangeMade()) {
                     InstanceManager.getDefault(jmri.ConfigureManager.class).storePrefs();
                 }
-                return true;
             }
         };
         InstanceManager.getOptionalDefault(jmri.ShutDownManager.class).ifPresent(sdm -> {

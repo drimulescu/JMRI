@@ -87,9 +87,8 @@ public class SimpleServlet extends WebSocketServlet {
             this.connection = new JmriConnection(cnctn);
             this.shutDownTask = new QuietShutDownTask("Close simple web sockets") { // NOI18N
                 @Override
-                public boolean execute() {
+                public void execute() {
                     SimpleWebSocket.this.connection.getSession().close();
-                    return true;
                 }
             };
             this.lightServer = new SimpleLightServer(this.connection);

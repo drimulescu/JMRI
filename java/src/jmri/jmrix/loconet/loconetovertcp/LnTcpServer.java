@@ -163,9 +163,8 @@ public class LnTcpServer {
             if (this.shutDownTask == null) {
                 this.shutDownTask = new QuietShutDownTask("LocoNetOverTcpServer") {
                     @Override
-                    public boolean execute() {
+                    public void execute() {
                         LnTcpServer.this.disable();
-                        return true;
                     }
                 };
             }

@@ -67,14 +67,13 @@ public class JsonServer extends JmriServer implements InstanceManagerAutoDefault
         this.mapper = new ObjectMapper().configure(Feature.AUTO_CLOSE_SOURCE, false);
         shutDownTask = new QuietShutDownTask("Stop JSON Server") { // NOI18N
             @Override
-            public boolean execute() {
+            public void execute() {
                 try {
                     JsonServer.this.stop();
                 } catch (Exception ex) {
                     log.warn("ERROR shutting down JSON Server: \\{}{}", ex.getMessage());
                     log.debug("Details follow: ", ex);
                 }
-                return true;
             }
         };
     }

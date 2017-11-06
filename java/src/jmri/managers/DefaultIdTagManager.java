@@ -77,7 +77,7 @@ public class DefaultIdTagManager extends AbstractManager<IdTag> implements IdTag
                 InstanceManager.getOptionalDefault(ShutDownManager.class).ifPresent((sdm) -> {
                     this.shutDownTask = new jmri.implementation.AbstractShutDownTask("Writing IdTags") { // NOI18N
                         @Override
-                        public boolean execute() {
+                        public void execute() {
                             // Save IdTag details prior to exit, if necessary
                             log.debug("Start writing IdTag details...");
                             try {
@@ -86,9 +86,6 @@ public class DefaultIdTagManager extends AbstractManager<IdTag> implements IdTag
                             } catch (java.io.IOException ioe) {
                                 log.error("Exception writing IdTags: {}", (Object) ioe);
                             }
-
-                            // continue shutdown
-                            return true;
                         }
                     };
                     sdm.register(this.shutDownTask);

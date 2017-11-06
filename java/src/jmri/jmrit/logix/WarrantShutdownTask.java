@@ -37,11 +37,9 @@ public class WarrantShutdownTask extends AbstractShutDownTask {
 
     /**
      * Take the necessary action.
-     *
-     * @return true if the shutdown should continue, false to abort.
      */
     @Override
-    public boolean execute() {
+    public void execute() {
         WarrantPreferences preferences = WarrantPreferences.getDefault();
         switch (preferences.getShutdown()) {
             case MERGE_ALL:
@@ -65,7 +63,6 @@ public class WarrantShutdownTask extends AbstractShutDownTask {
                 log.warn("No choice made for warrant shutdown");
                 break;
         }
-        return true;
     }
 
     private boolean makeMergeCandidates() {

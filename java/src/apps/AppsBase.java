@@ -340,7 +340,7 @@ public abstract class AppsBase {
                 register(new AbstractShutDownTask("Writing Blocks") {
 
                     @Override
-                    public boolean execute() {
+                    public void execute() {
                         // Save block values prior to exit, if necessary
                         log.debug("Start writing block info");
                         try {
@@ -349,9 +349,6 @@ public abstract class AppsBase {
                         catch (java.io.IOException ioe) {
                             log.error("Exception writing blocks:", ioe);
                         }
-
-                        // continue shutdown
-                        return true;
                     }
                 });
     }

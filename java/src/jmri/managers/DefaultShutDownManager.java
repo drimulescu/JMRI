@@ -215,11 +215,7 @@ public class DefaultShutDownManager implements ShutDownManager {
                 log.debug("Calling task \"{}\"", task.getName());
                 Date timer = new Date();
                 try {
-                    setShuttingDown(task.execute()); // if a task aborts the shutdown, stop shutting down
-                    if (!shuttingDown) {
-                        log.info("Program termination aborted by \"{}\"", task.getName());
-                        return false;  // abort early
-                    }
+                    task.execute();
                 } catch (Exception e) {
                     log.error("Error during processing of ShutDownTask \"{}\"", task.getName(), e);
                 } catch (Throwable e) {

@@ -188,7 +188,7 @@ public class Apps extends JPanel implements PropertyChangeListener, WindowListen
         InstanceManager.getDefault(ShutDownManager.class).
                 register(new AbstractShutDownTask("Writing Blocks") {
                     @Override
-                    public boolean execute() {
+                    public void execute() {
                         // Save block values prior to exit, if necessary
                         log.debug("Start writing block info");
                         try {
@@ -197,9 +197,6 @@ public class Apps extends JPanel implements PropertyChangeListener, WindowListen
                         catch (IOException ioe) {
                             log.error("Exception writing blocks: {}", ioe.getMessage());
                         }
-
-                        // continue shutdown
-                        return true;
                     }
                 });
 

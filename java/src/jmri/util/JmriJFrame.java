@@ -821,9 +821,8 @@ public class JmriJFrame extends JFrame implements WindowListener, jmri.ModifiedF
         InstanceManager.getOptionalDefault(ShutDownManager.class).ifPresent(sdm -> {
             task = new jmri.implementation.AbstractShutDownTask(getTitle()) {
                 @Override
-                public boolean execute() {
+                public void execute() {
                     handleModified();
-                    return true;
                 }
             };
             sdm.register(task);
