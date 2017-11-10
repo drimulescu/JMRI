@@ -842,13 +842,15 @@ abstract public class Editor extends JmriJFrame implements MouseListener, MouseM
             AffineTransform saveTransform = null;
             if (g instanceof Graphics2D) {
                 g2d = (Graphics2D) g;
-                g2d.scale(_paintScale, _paintScale);
 
                 // Save current transform
                 saveTransform = g2d.getTransform();
-                
+
                 // Mirror and/or rotate if desired
                 g2d.transform(transform);
+
+                // Scale the view
+                g2d.scale(_paintScale, _paintScale);
             }
 
             super.paint(g);
