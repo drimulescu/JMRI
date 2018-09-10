@@ -387,6 +387,7 @@ abstract public class AbstractSerialConnectionConfig extends AbstractConnectionC
 
     @Override
     protected void showAdvancedItems() {
+        System.out.format("Daniel QQQ%n");
         _details.removeAll();
         cL.anchor = GridBagConstraints.WEST;
         cL.insets = new Insets(2, 5, 0, 5);
@@ -394,6 +395,7 @@ abstract public class AbstractSerialConnectionConfig extends AbstractConnectionC
         cR.anchor = GridBagConstraints.WEST;
         cR.gridx = 1;
         cL.gridx = 0;
+        System.out.format("Daniel ---: %d%n", cL.gridwidth, cR.gridwidth);
         int i = 0;
         int stdrows = 0;
         boolean incAdvancedOptions = true;

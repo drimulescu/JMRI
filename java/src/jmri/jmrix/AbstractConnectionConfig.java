@@ -193,15 +193,19 @@ abstract public class AbstractConnectionConfig implements ConnectionConfig {
     @Override
     abstract public void loadDetails(final JPanel details);
 
-    protected GridBagLayout gbLayout = new GridBagLayout();
+//    protected GridBagLayout gbLayout = new GridBagLayout();
+    protected GridBagLayout gbLayout = new AA_Daniel_GridbagLayout();
+//    protected GridBagConstraints cL = new GridBagConstraints(17, 0, 0, 0, 0, 0, 0, 0, null, 1, 1);
     protected GridBagConstraints cL = new GridBagConstraints();
     protected GridBagConstraints cR = new GridBagConstraints();
 
     abstract protected void showAdvancedItems();
 
     protected int addStandardDetails(PortAdapter adapter, boolean incAdvanced, int i) {
+        System.out.format("Daniel AAA: %d%n", i);
         for (String item : options.keySet()) {
             if (!options.get(item).isAdvanced()) {
+                System.out.format("Daniel BBB: %d%n", cL.gridwidth, cR.gridwidth);
                 cR.gridy = i;
                 cL.gridy = i;
                 gbLayout.setConstraints(options.get(item).getLabel(), cL);
@@ -213,6 +217,7 @@ abstract public class AbstractConnectionConfig implements ConnectionConfig {
         }
 
         if (adapter.getSystemConnectionMemo() != null) {
+            System.out.format("Daniel CCC: %d%n", cL.gridwidth, cR.gridwidth);
             cR.gridy = i;
             cL.gridy = i;
             gbLayout.setConstraints(systemPrefixLabel, cL);
@@ -229,6 +234,7 @@ abstract public class AbstractConnectionConfig implements ConnectionConfig {
             i++;
         }
         if (incAdvanced) {
+            System.out.format("Daniel DDD: %d%n", cL.gridwidth, cR.gridwidth);
             cL.gridwidth = 2;
             cL.gridy = i;
             cR.gridy = i;

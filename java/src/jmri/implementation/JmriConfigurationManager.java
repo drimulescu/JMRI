@@ -239,7 +239,8 @@ public class JmriConfigurationManager implements ConfigureManager {
                             errorList.add("");
                             errorList.add(Bundle.getMessage("InitExMessageLogs")); // NOI18N
                             
-                            ErrorDialog dialog = new ErrorDialog(errorList);
+//                            ErrorDialog dialog = new ErrorDialog(errorList);
+                            ErrorDialog dialog = new ErrorDialog(ErrorDialog.Result.EDIT_CONNECTIONS);
                             
                             switch (dialog.result) {
                                 case NEW_PROFILE:
@@ -263,6 +264,10 @@ public class JmriConfigurationManager implements ConfigureManager {
                                     }
                                     
                                     new ConnectionsPreferencesDialog();
+                                    
+                                    // For testing only
+                                    // Quit program
+                                    AppsBase.handleQuit();
                                     
                                     // Restart program
                                     AppsBase.handleRestart();
@@ -377,6 +382,10 @@ public class JmriConfigurationManager implements ConfigureManager {
         
         Result result = Result.EXIT_PROGRAM;
 
+        ErrorDialog(Result result) {
+            this.result = result;
+        }
+        
         ErrorDialog(List<String> list) {
             super();
             setTitle("JMRI is unable to connect");
@@ -510,14 +519,22 @@ public class JmriConfigurationManager implements ConfigureManager {
             });
             buttonpanel.add(save);
             
+            //DANIEL******************
+            JButton danielButton = new JButton("Daniel");
+            danielButton.addActionListener((ActionEvent e) -> {
+                danielButtonPressed(detailpanel);
+            });
+
+            buttonpanel.add(danielButton);
+            //DANIEL******************
+            
             setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
             
             for (PreferencesPanel panel : ServiceLoader.load(PreferencesPanel.class)) {
-                System.out.format("Daniel: %s%n", panel.getClass().getName());
-                
                 if (panel instanceof jmri.jmrix.swing.ConnectionsPreferencesPanel) {
                     prefPanels.add(panel);
                     detailpanel.add(panel.getPreferencesComponent());
+//                    ((jmri.jmrix.swing.ConnectionsPreferencesPanel) panel).validate();
                 }
             }
             
@@ -526,9 +543,105 @@ public class JmriConfigurationManager implements ConfigureManager {
             add(detailpanel);
             list.setSelectedIndex(0);
             
+//            detailpanel.revalidate();
+//            test(detailpanel.getComponent(0));
+            
             // For testing only! Must be removed!
 //            Object comboBox = ((java.awt.Container)((java.awt.Container)((java.awt.Container)((java.awt.Container)((java.awt.Container)detailpanel.getComponent(0)).getComponent(0)).getComponent(0)).getComponent(0)).getComponent(3)).getComponent(0);
 //            ((javax.swing.JComboBox)comboBox).setSelectedIndex(((javax.swing.JComboBox)comboBox).getSelectedIndex());
+        }
+        
+        private void test(java.awt.Component c) {
+            if (c instanceof java.awt.Container) {
+                for (java.awt.Component child : ((java.awt.Container) c).getComponents()) {
+                    test(child);
+                }
+            }
+        }
+        
+        private void danielButtonPressed(JPanel detailpanel) {
+//            desiredObject = ((java.awt.Container)((java.awt.Container)((java.awt.Container)((java.awt.Container)((java.awt.Container)detailpanel.getComponent(0)).getComponent(0)).getComponent(0)).getComponent(0)).getComponent(3)).getComponent(0);
+//            ((javax.swing.JComboBox)desiredObject).setSelectedIndex(((javax.swing.JComboBox)desiredObject).getSelectedIndex());
+            showComponent("1", "", detailpanel);
+        }
+        
+        private Object desiredObject = null;
+        
+        private void showComponent(String id, String padding, java.awt.Component c) {
+            
+            if (desiredObject == c)
+                System.out.println("Daniel AAAA match");
+            
+            switch (c.getClass().getName()) {
+                case "javax.swing.JLabel":
+                    System.out.format("%s%s: %s - %s%n", padding, id, c.getClass().getName(), ((javax.swing.JLabel)c).getText());
+                    break;
+                    
+                case "javax.swing.JButton":
+                    System.out.format("%s%s: %s - %s%n", padding, id, c.getClass().getName(), ((javax.swing.JButton)c).getText());
+                    break;
+                    
+                case "javax.swing.JCheckBox":
+                    System.out.format("%s%s: %s - %s%n", padding, id, c.getClass().getName(), ((javax.swing.JCheckBox)c).getText());
+                    break;
+                    
+                case "javax.swing.JTextField":
+                    System.out.format("%s%s: %s - %s%n", padding, id, c.getClass().getName(), ((javax.swing.JTextField)c).getText());
+                    break;
+                    
+//                case "jmri.swing.JTitledSeparator":
+//                    System.out.format("%s%s - %s%n", padding, c.getClass().getName(), ((jmri.swing.JTitledSeparator)c).getName());
+//                    break;
+                    
+                case "javax.swing.JComboBox":
+                    String s = "";
+                    for (int i=0; i < ((javax.swing.JComboBox)c).getItemCount(); i++) {
+                        s = s + ((javax.swing.JComboBox)c).getItemAt(i) + ", ";
+                    }
+                    System.out.format("%s%s: %s - %s%n", padding, id, c.getClass().getName(), s);
+                    
+                    if ("1.1.1.1.1.4.1".equals(id)) {
+                        if (desiredObject == c)
+                            System.out.println("Daniel match");
+                        else
+                            System.out.println("Daniel ERROR");
+//                        ((javax.swing.JComboBox)c).setSelectedIndex(((javax.swing.JComboBox)c).getSelectedIndex());
+                    }
+                    
+                    break;
+                    
+                case "javax.swing.JViewport":
+                    break;
+                    
+                case "javax.swing.JPanel":
+                    System.out.format("%s%s: %s%n", padding, id, c.getClass().getName());
+                    
+                    if ("1.1.1.1.2.1.1".equals(id)) {
+                        java.awt.LayoutManager l = ((javax.swing.JPanel)c).getLayout();
+                        System.out.format("%s%n", l.getClass().getName());
+                        
+                        int count = 1;
+                        for (java.awt.Component child : ((java.awt.Container)c).getComponents()) {
+                            java.awt.GridBagConstraints cns = ((java.awt.GridBagLayout)l).getConstraints(child);
+                            System.out.format("gx: %d, gy: %d, gw: %d, gh: %d, ipadx: %d, ipady: %d, wx: %d, wy: %d%n", cns.anchor, cns.fill, cns.gridx, cns.gridy, cns.gridwidth, cns.gridheight, cns.ipadx, cns.ipady, cns.weightx, cns.weighty);
+                            count++;
+//                            showComponent(id+"."+Integer.toString(count), padding+"   ", child);
+                        }
+                        
+                        System.out.format("%s%n", l.toString());
+                    }
+                    break;
+                    
+                default:
+                    System.out.format("%s%s: %s%n", padding, id, c.getClass().getName());
+            }
+            
+            if (c instanceof java.awt.Container) {
+                int count = 1;
+                for (java.awt.Component child : ((java.awt.Container)c).getComponents()) {
+                    showComponent(id+"."+Integer.toString(count++), padding+"   ", child);
+                }
+            }
         }
         
         public boolean isPreferencesValid() {

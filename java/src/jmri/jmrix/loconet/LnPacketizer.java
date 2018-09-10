@@ -116,7 +116,8 @@ public class LnPacketizer extends LnTrafficController {
                 // null test added in 4.11.6 in LnPowerManager and LnSensorManager
             }
         } catch (NullPointerException npe) {
-            log.warn("xmtHandler.notify() npe");
+            // DANIEL: Block this message during development!!!
+//            log.warn("xmtHandler.notify() npe");
             throw npe; // is caught by LnSensor/PowerManager run()
         } catch (RuntimeException e) {
             log.warn("passing to xmit: unexpected exception: ", e);
