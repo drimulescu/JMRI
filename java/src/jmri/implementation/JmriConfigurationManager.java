@@ -263,7 +263,9 @@ public class JmriConfigurationManager implements ConfigureManager {
                                         Thread.currentThread().interrupt();
                                     }
                                     
-                                    new ConnectionsPreferencesDialog();
+                                    (new TabbedPreferencesAction()).actionPerformed();
+                                    try { Thread.sleep(10000); } catch (InterruptedException e) { };
+//                                    new ConnectionsPreferencesDialog();
                                     
                                     // For testing only
                                     // Quit program
