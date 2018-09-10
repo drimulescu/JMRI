@@ -26,8 +26,8 @@ public class AA_Daniel_GridbagLayout extends GridBagLayout {
     }
     
     String getStr(GridBagConstraints cns) {
-        return String.format("anchor: %s, fill: %d, gx: %s, gy: %s, gw: %d, gh: %d, ipadx: %d, ipady: %d, wx: %1.2f, wy: %1.2f",
-                getAnchor(cns.anchor), cns.fill,
+        return String.format("anchor: %s, fill: %s, gx: %s, gy: %s, gw: %d, gh: %d, ipadx: %d, ipady: %d, wx: %1.2f, wy: %1.2f",
+                getAnchor(cns.anchor), getFill(cns.fill),
                 (cns.gridx != -1) ? Integer.toString(cns.gridx) : "Relative", (cns.gridy != -1) ? Integer.toString(cns.gridy) : "Relative",
                 cns.gridwidth, cns.gridheight, cns.ipadx, cns.ipady, cns.weightx, cns.weighty);
     }
@@ -102,6 +102,21 @@ public class AA_Daniel_GridbagLayout extends GridBagLayout {
                 return "BELOW_BASELINE_LEADING";
             case GridBagConstraints.BELOW_BASELINE_TRAILING:
                 return "BELOW_BASELINE_TRAILING";
+            default:
+                return "__UNKNOWN__";
+        }
+    }
+    
+    String getFill(int fill) {
+        switch (fill) {
+            case GridBagConstraints.NONE:
+                return "NONE";
+            case GridBagConstraints.HORIZONTAL:
+                return "HORIZONTAL";
+            case GridBagConstraints.VERTICAL:
+                return "VERTICAL";
+            case GridBagConstraints.BOTH:
+                return "BOTH";
             default:
                 return "__UNKNOWN__";
         }
