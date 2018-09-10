@@ -26,8 +26,8 @@ public class AA_Daniel_GridbagLayout extends GridBagLayout {
     }
     
     String getStr(GridBagConstraints cns) {
-        return String.format("anchor: %d, fill: %d, gx: %s, gy: %s, gw: %d, gh: %d, ipadx: %d, ipady: %d, wx: %1.2f, wy: %1.2f",
-                cns.anchor, cns.fill,
+        return String.format("anchor: %s, fill: %d, gx: %s, gy: %s, gw: %d, gh: %d, ipadx: %d, ipady: %d, wx: %1.2f, wy: %1.2f",
+                getAnchor(cns.anchor), cns.fill,
                 (cns.gridx != -1) ? Integer.toString(cns.gridx) : "Relative", (cns.gridy != -1) ? Integer.toString(cns.gridy) : "Relative",
                 cns.gridwidth, cns.gridheight, cns.ipadx, cns.ipady, cns.weightx, cns.weighty);
     }
@@ -36,9 +36,74 @@ public class AA_Daniel_GridbagLayout extends GridBagLayout {
         String className = o.getClass().getName();
         switch (className) {
             case "javax.swing.JCheckBox":
-                return String.format("%s (%s)", className, ((javax.swing.JCheckBox)o).getText());
+                return String.format("%s(%s)", className, ((javax.swing.JCheckBox)o).getText());
+            case "javax.swing.JComboBox":
+                return String.format("%s(%s)", className, ((javax.swing.JComboBox)o).getSelectedItem());
+            case "javax.swing.JLabel":
+                return String.format("%s(%s)", className, ((javax.swing.JLabel)o).getText());
+            case "javax.swing.JTextField":
+                return String.format("%s(%s)", className, ((javax.swing.JTextField)o).getText());
             default:
                 return className;
+        }
+    }
+    
+    String getAnchor(int anchor) {
+        switch (anchor) {
+            case GridBagConstraints.CENTER:
+                return "CENTER";
+            case GridBagConstraints.NORTH:
+                return "NORTH";
+            case GridBagConstraints.NORTHEAST:
+                return "NORTHEAST";
+            case GridBagConstraints.EAST:
+                return "EAST";
+            case GridBagConstraints.SOUTHEAST:
+                return "SOUTHEAST";
+            case GridBagConstraints.SOUTH:
+                return "SOUTH";
+            case GridBagConstraints.SOUTHWEST:
+                return "SOUTHWEST";
+            case GridBagConstraints.WEST:
+                return "WEST";
+            case GridBagConstraints.NORTHWEST:
+                return "NORTHWEST";
+            case GridBagConstraints.PAGE_START:
+                return "PAGE_START";
+            case GridBagConstraints.PAGE_END:
+                return "PAGE_END";
+            case GridBagConstraints.LINE_START:
+                return "LINE_START";
+            case GridBagConstraints.LINE_END:
+                return "LINE_END";
+            case GridBagConstraints.FIRST_LINE_START:
+                return "FIRST_LINE_START";
+            case GridBagConstraints.FIRST_LINE_END:
+                return "FIRST_LINE_END";
+            case GridBagConstraints.LAST_LINE_START:
+                return "LAST_LINE_START";
+            case GridBagConstraints.LAST_LINE_END:
+                return "LAST_LINE_END";
+            case GridBagConstraints.BASELINE:
+                return "BASELINE";
+            case GridBagConstraints.BASELINE_LEADING:
+                return "BASELINE_LEADING";
+            case GridBagConstraints.BASELINE_TRAILING:
+                return "BASELINE_TRAILING";
+            case GridBagConstraints.ABOVE_BASELINE:
+                return "ABOVE_BASELINE";
+            case GridBagConstraints.ABOVE_BASELINE_LEADING:
+                return "ABOVE_BASELINE_LEADING";
+            case GridBagConstraints.ABOVE_BASELINE_TRAILING:
+                return "ABOVE_BASELINE_TRAILING";
+            case GridBagConstraints.BELOW_BASELINE:
+                return "BELOW_BASELINE";
+            case GridBagConstraints.BELOW_BASELINE_LEADING:
+                return "BELOW_BASELINE_LEADING";
+            case GridBagConstraints.BELOW_BASELINE_TRAILING:
+                return "BELOW_BASELINE_TRAILING";
+            default:
+                return "__UNKNOWN__";
         }
     }
     
