@@ -15,11 +15,13 @@ import jmri.swing.PreferencesPanel;
  * 
  * This dialog must not be used together with TabbedPreferencesFrame.
  */
-public final class TabbedPreferencesDialog extends JDialog implements WindowListener {
+public final class EditConnectionPreferencesDialog extends JDialog implements WindowListener {
 
+    final EditConnectionPreferences editConnectionPreferences;
+    
     @Override
     public String getTitle() {
-        return getTabbedPreferences().getTitle();
+        return editConnectionPreferences.getTitle();
     }
 
     public boolean isMultipleInstances() {
@@ -27,7 +29,6 @@ public final class TabbedPreferencesDialog extends JDialog implements WindowList
     }
     
     public static boolean showDialog(TabbedPreferences.FilterPreferences filterPreferences, boolean addQuitButton) {
-        TabbedPreferencesDialog dialog = new TabbedPreferencesDialog();
         try {
             while (jmri.InstanceManager.getDefault(TabbedPreferences.class).init(filterPreferences, addQuitButton) != TabbedPreferences.INITIALISED) {
                 final Object waiter = new Object();
@@ -35,6 +36,8 @@ public final class TabbedPreferencesDialog extends JDialog implements WindowList
                     waiter.wait(50);
                 }
             }
+            
+            EditConnectionPreferencesDialog dialog = new EditConnectionPreferencesDialog();
             SwingUtilities.updateComponentTreeUI(dialog);
             
             // might not be a preferences item set yet
@@ -49,27 +52,30 @@ public final class TabbedPreferencesDialog extends JDialog implements WindowList
         }
     }
 
-    public TabbedPreferencesDialog() {
+    public EditConnectionPreferencesDialog() {
         super();
         setModal(true);
-        TabbedPreferences tabbedPreferences = getTabbedPreferences();
-        tabbedPreferences.dialog = this;
-        add(tabbedPreferences);
-//        add(getTabbedPreferences());
+//        TabbedPreferences tabbedPreferences = editConnectionPreferences;
+//        TabbedPreferences tabbedPreferences = editConnectionPreferences;
+        editConnectionPreferences = new EditConnectionPreferences(this);
+//        EditConnectionPreferences tabbedPreferences = editConnectionPreferences;
+        editConnectionPreferences.init();
+        add(editConnectionPreferences);
+//        add(editConnectionPreferences);
 //        addHelpMenu("package.apps.TabbedPreferences", true); // NOI18N
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(this);
     }
 
     public void gotoPreferenceItem(String item, String sub) {
-        getTabbedPreferences().gotoPreferenceItem(item, sub);
+        editConnectionPreferences.gotoPreferenceItem(item, sub);
     }
 
     @Override
     public void windowClosing(WindowEvent e) {
         ShutDownManager sdm = InstanceManager.getNullableDefault(ShutDownManager.class);
-        if (!getTabbedPreferences().isPreferencesValid() && (sdm == null || !sdm.isShuttingDown())) {
-            for (PreferencesPanel panel : getTabbedPreferences().getPreferencesPanels().values()) {
+        if (!editConnectionPreferences.isPreferencesValid() && (sdm == null || !sdm.isShuttingDown())) {
+            for (PreferencesPanel panel : editConnectionPreferences.getPreferencesPanels().values()) {
                 if (!panel.isPreferencesValid()) {
                     switch (JOptionPane.showConfirmDialog(this,
                             Bundle.getMessage("InvalidPreferencesMessage", panel.getTabbedPreferencesTitle()),
@@ -78,7 +84,7 @@ public final class TabbedPreferencesDialog extends JDialog implements WindowList
                             JOptionPane.ERROR_MESSAGE)) {
                         case JOptionPane.YES_OPTION:
                             // abort window closing and return to broken preferences
-                            getTabbedPreferences().gotoPreferenceItem(panel.getPreferencesItem(), panel.getTabbedPreferencesTitle());
+                            editConnectionPreferences.gotoPreferenceItem(panel.getPreferencesItem(), panel.getTabbedPreferencesTitle());
                             return;
                         default:
                             // do nothing
@@ -87,15 +93,15 @@ public final class TabbedPreferencesDialog extends JDialog implements WindowList
                 }
             }
         }
-        if (getTabbedPreferences().isDirty()) {
+        if (editConnectionPreferences.isDirty()) {
             switch (JOptionPane.showConfirmDialog(this,
-                    Bundle.getMessage("UnsavedChangesMessage", getTabbedPreferences().getTitle()), // NOI18N
+                    Bundle.getMessage("UnsavedChangesMessage", editConnectionPreferences.getTitle()), // NOI18N
                     Bundle.getMessage("UnsavedChangesTitle"), // NOI18N
                     JOptionPane.YES_NO_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE)) {
                 case JOptionPane.YES_OPTION:
                     // save preferences
-                    getTabbedPreferences().savePressed(getTabbedPreferences().invokeSaveOptions());
+                    editConnectionPreferences.savePressed(editConnectionPreferences.invokeSaveOptions());
                     break;
                 case JOptionPane.NO_OPTION:
                     // do nothing
@@ -107,17 +113,6 @@ public final class TabbedPreferencesDialog extends JDialog implements WindowList
             }
         }
         this.setVisible(false);
-    }
-
-    /**
-     * Ensure a TabbedPreferences instance is always available.
-     *
-     * @return the default TabbedPreferences instance, creating it if needed
-     */
-    private TabbedPreferences getTabbedPreferences() {
-        return InstanceManager.getOptionalDefault(TabbedPreferences.class).orElseGet(() -> {
-            return InstanceManager.setDefault(TabbedPreferences.class, new TabbedPreferences());
-        });
     }
 
     @Override

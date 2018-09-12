@@ -4,8 +4,7 @@ import apps.AppsBase;
 import apps.ConfigBundle;
 import apps.gui3.TabbedPreferences;
 import apps.gui3.TabbedPreferencesAction;
-import apps.gui3.TabbedPreferencesDialog;
-import apps.gui3.TabbedPreferencesDialog_Daniel;
+import apps.gui3.EditConnectionPreferencesDialog;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
@@ -273,8 +272,8 @@ public class JmriConfigurationManager implements ConfigureManager {
                                             = (PreferencesPanel panel) -> (panel instanceof jmri.jmrix.swing.ConnectionsPreferencesPanel);
                                     
 //                                    if (TabbedPreferencesDialog.showDialog(filterPreferences, true)) {
-                                    if (TabbedPreferencesDialog_Daniel.showDialog(filterPreferences, true)) {
-//                                    if (TabbedPreferencesDialog_Daniel.showDialog(null, true)) {
+                                    if (EditConnectionPreferencesDialog.showDialog(filterPreferences, true)) {
+//                                    if (EditConnectionPreferencesDialog.showDialog(null, true)) {
                                         // Restart program
                                         AppsBase.handleRestart();
                                         break;

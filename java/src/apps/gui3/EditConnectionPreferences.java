@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
  * @author Bob Jacobsen Copyright 2010
  * @author Randall Wood 2012, 2016
  */
-public class TabbedPreferences_Daniel extends AppConfigBase {
+public class EditConnectionPreferences extends AppConfigBase {
 
     @Override
     public String getHelpTarget() {
@@ -84,7 +84,7 @@ public class TabbedPreferences_Daniel extends AppConfigBase {
      * The dialog that displays the preferences, if displayed in a dialog.
      * Used by the quit button to dispose the dialog.
      */
-    JDialog dialog = null;
+    final JDialog dialog;
     
     ArrayList<PreferencesCatItems> preferencesArray = new ArrayList<>();
     JPanel buttonpanel;
@@ -92,15 +92,11 @@ public class TabbedPreferences_Daniel extends AppConfigBase {
     JButton save;
     JButton quit = null;
     JScrollPane listScroller;
-    private int initialisationState = 0x00;
 
-    public static final int UNINITIALISED = 0x00;
-    public static final int INITIALISING = 0x01;
-    public static final int INITIALISED = 0x02;
-    public static final String INITIALIZATION = "PROP_INITIALIZATION";
+    public EditConnectionPreferences(JDialog dialog) {
 
-    public TabbedPreferences_Daniel() {
-
+        this.dialog = dialog;
+        
         /*
          * Adds the place holders for the menu managedPreferences so that any managedPreferences add by
          * third party code is added to the end
@@ -114,21 +110,9 @@ public class TabbedPreferences_Daniel extends AppConfigBase {
      * {@link java.util.ServiceLoader}.
      * <p>
      * Keeps a current state to prevent doing its work twice.
-     *
-     * @param filterPreferences filter which preferences to show
-     * @param addQuitButton add a quit button to the form?
-     * @return The current state, which should be INITIALISED if all is well.
      */
-    @SuppressWarnings("rawtypes")
-    public synchronized int init(boolean addQuitButton) {
-        if (initialisationState == INITIALISED) {
-            return INITIALISED;
-        }
-        if (initialisationState != UNINITIALISED) {
-            return initialisationState;
-        }
-        this.setInitalisationState(INITIALISING);
-
+//    @SuppressWarnings("rawtypes")
+    public void init() {
         list = new JList<>();
         listScroller = new JScrollPane(list);
         listScroller.setPreferredSize(new Dimension(100, 100));
@@ -148,77 +132,16 @@ public class TabbedPreferences_Daniel extends AppConfigBase {
             savePressed(invokeSaveOptions());
         });
 
-        if (addQuitButton) {
-            quit = new JButton(
-                    ConfigBundle.getMessage("ButtonQuit"));
-//                    new ImageIcon(FileUtil.findURL("program:resources/icons/misc/gui3/SaveIcon.png", FileUtil.Location.INSTALLED)));
-            quit.addActionListener((ActionEvent e) -> {
-                if (dialog != null) {
-                    dialog.dispose();
-                }
-            });
-        }
+        quit = new JButton(
+                ConfigBundle.getMessage("ButtonQuit"));
+//                new ImageIcon(FileUtil.findURL("program:resources/icons/misc/gui3/SaveIcon.png", FileUtil.Location.INSTALLED)));
+        quit.addActionListener((ActionEvent e) -> {
+            if (dialog != null) {
+                dialog.dispose();
+            }
+        });
 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        // panels that are dependent upon another panel being added first
-        Set<PreferencesPanel> delayed = new HashSet<>();
-/*
-        // add preference panels registered with the Instance Manager
-        for (PreferencesPanel panel : InstanceManager.getList(jmri.swing.PreferencesPanel.class)) {
-            if ((filterPreferences == null) || filterPreferences.filter(panel)) {
-                if (panel instanceof PreferencesSubPanel) {
-                    String parent = ((PreferencesSubPanel) panel).getParentClassName();
-                    if (!this.getPreferencesPanels().containsKey(parent)) {
-                        delayed.add(panel);
-                    } else {
-                        ((PreferencesSubPanel) panel).setParent(this.getPreferencesPanels().get(parent));
-                    }
-                }
-                if (!delayed.contains(panel)) {
-                    this.addPreferencesPanel(panel);
-                }
-            }
-        }
-
-        for (PreferencesPanel panel : ServiceLoader.load(PreferencesPanel.class)) {
-            if ((filterPreferences == null) || filterPreferences.filter(panel)) {
-                if (panel instanceof PreferencesSubPanel) {
-                    String parent = ((PreferencesSubPanel) panel).getParentClassName();
-                    if (!this.getPreferencesPanels().containsKey(parent)) {
-                        delayed.add(panel);
-                    } else {
-                        ((PreferencesSubPanel) panel).setParent(this.getPreferencesPanels().get(parent));
-                    }
-                }
-                if (!delayed.contains(panel)) {
-                    this.addPreferencesPanel(panel);
-                }
-            }
-        }
-        while (!delayed.isEmpty()) {
-            Set<PreferencesPanel> iterated = new HashSet<>(delayed);
-            iterated.stream().filter((panel) -> (panel instanceof PreferencesSubPanel)).forEach((panel) -> {
-                String parent = ((PreferencesSubPanel) panel).getParentClassName();
-                if (this.getPreferencesPanels().containsKey(parent)) {
-                    ((PreferencesSubPanel) panel).setParent(this.getPreferencesPanels().get(parent));
-                    delayed.remove(panel);
-                    this.addPreferencesPanel(panel);
-                }
-            });
-        }
-        preferencesArray.stream().forEach((preferences) -> {
-            detailpanel.add(preferences.getPanel(), preferences.getPrefItem());
-        });
-        preferencesArray.sort((PreferencesCatItems o1, PreferencesCatItems o2) -> {
-            int comparison = Integer.compare(o1.sortOrder, o2.sortOrder);
-            return (comparison != 0) ? comparison : o1.getPrefItem().compareTo(o2.getPrefItem());
-        });
-*/
-//        getTabbedPreferences().preferencesArray.stream().forEach((preferences) -> {
-//            System.out.format("%s, %s%n", preferences.getPrefItem(), preferences.getClass().getName());
-//            detailpanel.add(preferences.getPanel(), preferences.getPrefItem());
-//            this.addPreferencesPanel(preferences);
-//        });
         getTabbedPreferences().preferencesArray.stream().forEach((preferences) -> {
 //        preferencesArray.stream().forEach((preferences) -> {
             detailpanel.add(preferences.getPanel(), preferences.getPrefItem());
@@ -237,22 +160,6 @@ public class TabbedPreferences_Daniel extends AppConfigBase {
 
         list.setSelectedIndex(0);
         selection(preferencesArray.get(0).getPrefItem());
-        this.setInitalisationState(INITIALISED);
-        return initialisationState;
-    }
-
-    public synchronized void setInitalisationState(int state) { // currently only used in init(), but synchronized in case added elsewhere later
-        int old = this.initialisationState;
-        this.initialisationState = state;
-        this.firePropertyChange(INITIALIZATION, old, state);
-    }
-
-    public synchronized int getInitialisationState() { // not an atomic read, because of time between assignment and propertyChange notification in set
-        return this.initialisationState;
-    }
-
-    public boolean isInitialised() {
-        return (this.getInitialisationState() == INITIALISED);
     }
 
     // package only - for TabbedPreferencesFrame
@@ -333,9 +240,7 @@ public class TabbedPreferences_Daniel extends AppConfigBase {
             preferencesArray.add(itemBeingAdded);
             // As this is a new item in the selection list, we need to update
             // the JList.
-            if (getInitialisationState() == INITIALISED) {
-                updateJList();
-            }
+            updateJList();
         }
         if (tabTitle == null) {
             tabTitle = itemText;
@@ -665,6 +570,6 @@ public class TabbedPreferences_Daniel extends AppConfigBase {
         });
     }
     
-    private final static Logger log = LoggerFactory.getLogger(TabbedPreferences_Daniel.class);
+    private final static Logger log = LoggerFactory.getLogger(EditConnectionPreferences.class);
 
 }
