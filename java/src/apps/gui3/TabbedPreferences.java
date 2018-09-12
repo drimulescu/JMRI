@@ -16,6 +16,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -71,6 +72,7 @@ public class TabbedPreferences extends AppConfigBase {
         return false;
     } // only one of these!
 
+    JDialog dialog = null;
     ArrayList<Element> preferencesElements = new ArrayList<>();
 
     JPanel detailpanel = new JPanel();
@@ -83,6 +85,7 @@ public class TabbedPreferences extends AppConfigBase {
     JPanel buttonpanel;
     JList<String> list;
     JButton save;
+    JButton quit;
     JScrollPane listScroller;
     private int initialisationState = 0x00;
 
@@ -134,7 +137,21 @@ public class TabbedPreferences extends AppConfigBase {
      * @return The current state, which should be INITIALISED if all is well.
      */
     @SuppressWarnings("rawtypes")
-    public synchronized int init() {
+    public int init() {
+        return init(new NullFilterPreferences());
+    }
+    
+    /**
+     * Initialize, including loading classes provided by a
+     * {@link java.util.ServiceLoader}.
+     * <p>
+     * Keeps a current state to prevent doing its work twice.
+     *
+     * @param filterPreferences
+     * @return The current state, which should be INITIALISED if all is well.
+     */
+    @SuppressWarnings("rawtypes")
+    public synchronized int init(FilterPreferences filterPreferences) {
         if (initialisationState == INITIALISED) {
             return INITIALISED;
         }
@@ -154,6 +171,7 @@ public class TabbedPreferences extends AppConfigBase {
         detailpanel = new JPanel();
         detailpanel.setLayout(new CardLayout());
         detailpanel.setBorder(BorderFactory.createEmptyBorder(6, 3, 6, 6));
+        detailpanel.setPreferredSize(new Dimension(700, 400));
 
         save = new JButton(
                 ConfigBundle.getMessage("ButtonSave"),
@@ -162,13 +180,22 @@ public class TabbedPreferences extends AppConfigBase {
             savePressed(invokeSaveOptions());
         });
 
+        quit = new JButton(
+                ConfigBundle.getMessage("ButtonQuit"));
+//                new ImageIcon(FileUtil.findURL("program:resources/icons/misc/gui3/SaveIcon.png", FileUtil.Location.INSTALLED)));
+        quit.addActionListener((ActionEvent e) -> {
+            if (dialog != null) {
+                dialog.dispose();
+            }
+        });
+
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         // panels that are dependent upon another panel being added first
         Set<PreferencesPanel> delayed = new HashSet<>();
 
         // add preference panels registered with the Instance Manager
         for (PreferencesPanel panel : InstanceManager.getList(jmri.swing.PreferencesPanel.class)) {
-            if (panel instanceof PreferencesSubPanel) {
+            if (filterPreferences.show(panel) && (panel instanceof PreferencesSubPanel)) {
                 String parent = ((PreferencesSubPanel) panel).getParentClassName();
                 if (!this.getPreferencesPanels().containsKey(parent)) {
                     delayed.add(panel);
@@ -182,16 +209,18 @@ public class TabbedPreferences extends AppConfigBase {
         }
 
         for (PreferencesPanel panel : ServiceLoader.load(PreferencesPanel.class)) {
-            if (panel instanceof PreferencesSubPanel) {
-                String parent = ((PreferencesSubPanel) panel).getParentClassName();
-                if (!this.getPreferencesPanels().containsKey(parent)) {
-                    delayed.add(panel);
-                } else {
-                    ((PreferencesSubPanel) panel).setParent(this.getPreferencesPanels().get(parent));
+            if (filterPreferences.show(panel)) {
+                if (panel instanceof PreferencesSubPanel) {
+                    String parent = ((PreferencesSubPanel) panel).getParentClassName();
+                    if (!this.getPreferencesPanels().containsKey(parent)) {
+                        delayed.add(panel);
+                    } else {
+                        ((PreferencesSubPanel) panel).setParent(this.getPreferencesPanels().get(parent));
+                    }
                 }
-            }
-            if (!delayed.contains(panel)) {
-                this.addPreferencesPanel(panel);
+                if (!delayed.contains(panel)) {
+                    this.addPreferencesPanel(panel);
+                }
             }
         }
         while (!delayed.isEmpty()) {
@@ -402,6 +431,7 @@ public class TabbedPreferences extends AppConfigBase {
         });
         buttonpanel.add(listScroller);
         buttonpanel.add(save);
+        buttonpanel.add(quit);
     }
 
     public boolean isPreferencesValid() {
@@ -461,6 +491,10 @@ public class TabbedPreferences extends AppConfigBase {
                     return;
                 }
             }
+            
+            System.out.format("addPreferenceItem(%s, %s, %s, %s, %d%n",
+                    title, labelkey, item.getClass().getName(), tooltip, sortOrder);
+            
             TabDetails tab = new TabDetails(labelkey, title, item, tooltip, sortOrder);
             tabDetailsArray.add(tab);
             tabDetailsArray.sort((TabDetails o1, TabDetails o2) -> {
@@ -619,4 +653,21 @@ public class TabbedPreferences extends AppConfigBase {
 
     private final static Logger log = LoggerFactory.getLogger(TabbedPreferences.class);
 
+    
+    
+    public interface FilterPreferences {
+        
+        boolean show(PreferencesPanel panel);
+        
+    }
+    
+    private class NullFilterPreferences implements FilterPreferences {
+
+        @Override
+        public boolean show(PreferencesPanel panel) {
+            return true;
+        }
+        
+    }
+    
 }

@@ -387,7 +387,7 @@ abstract public class AbstractSerialConnectionConfig extends AbstractConnectionC
 
     @Override
     protected void showAdvancedItems() {
-        System.out.format("Daniel QQQ%n");
+        System.out.format("Daniel QQQ: %b%n", showAdvanced.isSelected());
         _details.removeAll();
         cL.anchor = GridBagConstraints.WEST;
         cL.insets = new Insets(2, 5, 0, 5);

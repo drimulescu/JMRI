@@ -18,6 +18,7 @@ public class TabbedPreferencesAction extends jmri.util.swing.JmriAbstractAction 
 
     // must be null until first use to allow app initialization before construction
     static TabbedPreferencesFrame f = null;
+    static TabbedPreferencesDialog d = null;
     String preferencesItem = null;
     String preferenceSubCat = null;
     static boolean inWait = false;
@@ -103,6 +104,39 @@ public class TabbedPreferencesAction extends jmri.util.swing.JmriAbstractAction 
         }
     }
 
+    public void showDialog() {
+        // create the JTable model, with changes for specific NamedBean
+        // create the frame
+        if (inWait) {
+            log.info("We are already waiting for the preferences to be displayed");
+            return;
+        }
+
+        if (d == null) {
+            d = new TabbedPreferencesDialog();
+//            Thread preferencesInitThread = new Thread(() -> {
+                final Object waiter = new Object();
+                try {
+                    setWait(true);
+                    while (jmri.InstanceManager.getDefault(TabbedPreferences.class).init() != TabbedPreferences.INITIALISED) {
+                        synchronized (waiter) {
+                            waiter.wait(50);
+                        }
+                    }
+                    SwingUtilities.updateComponentTreeUI(d);
+                    showPreferencesDialog();
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                    setWait(false);
+                }
+//            });
+//            preferencesInitThread.setName("TabbedPreferencesAction actionPerformed");
+//            preferencesInitThread.start();
+        } else {
+            showPreferencesDialog();
+        }
+    }
+
     private void showPreferences() {
         // Update the GUI Look and Feel
         // This is needed as certain controls are instantiated
@@ -115,6 +149,20 @@ public class TabbedPreferencesAction extends jmri.util.swing.JmriAbstractAction 
         f.pack();
 
         f.setVisible(true);
+    }
+
+    private void showPreferencesDialog() {
+        // Update the GUI Look and Feel
+        // This is needed as certain controls are instantiated
+        // prior to the setup of the Look and Feel
+        setWait(false);
+        
+        // might not be a preferences item set yet
+        if (preferencesItem != null) d.gotoPreferenceItem(preferencesItem, preferenceSubCat);
+        
+        d.pack();
+
+        d.setVisible(true);
     }
 
     synchronized static void setWait(boolean boo) {

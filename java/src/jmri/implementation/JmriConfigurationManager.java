@@ -31,6 +31,8 @@ import jmri.ShutDownManager;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import jmri.Application;
 import jmri.swing.PreferencesPanel;
 import jmri.ConfigureManager;
@@ -43,7 +45,9 @@ import jmri.profile.AddProfileDialog;
 import jmri.profile.Profile;
 import jmri.profile.ProfileManager;
 import jmri.spi.PreferencesManager;
+import jmri.swing.PreferencesSubPanel;
 import jmri.util.FileUtil;
+import jmri.util.ThreadingUtil;
 import jmri.util.prefs.HasConnectionButUnableToConnectException;
 import jmri.util.prefs.InitializationException;
 import org.slf4j.Logger;
@@ -253,8 +257,12 @@ public class JmriConfigurationManager implements ConfigureManager {
                                     
                                 case EDIT_CONNECTIONS:
                                     final Object waiter = new Object();
+                                    System.out.format("Show preferences - init%n");
                                     try {
-                                        while (jmri.InstanceManager.getDefault(TabbedPreferences.class).init() != TabbedPreferences.INITIALISED) {
+                                        TabbedPreferences.FilterPreferences filterPreferences
+                                                = (PreferencesPanel panel) -> (panel instanceof jmri.jmrix.swing.ConnectionsPreferencesPanel);
+//                                        while (jmri.InstanceManager.getDefault(TabbedPreferences.class).init() != TabbedPreferences.INITIALISED) {
+                                        while (jmri.InstanceManager.getDefault(TabbedPreferences.class).init(filterPreferences) != TabbedPreferences.INITIALISED) {
                                             synchronized (waiter) {
                                                 waiter.wait(50);
                                             }
@@ -263,9 +271,12 @@ public class JmriConfigurationManager implements ConfigureManager {
                                         Thread.currentThread().interrupt();
                                     }
                                     
-                                    (new TabbedPreferencesAction()).actionPerformed();
-                                    try { Thread.sleep(10000); } catch (InterruptedException e) { };
-//                                    new ConnectionsPreferencesDialog();
+                                    System.out.format("Show preferences%n");
+//                                    (new TabbedPreferencesAction()).actionPerformed();
+//                                    (new TabbedPreferencesAction()).showDialog();
+////                                    try { Thread.sleep(10000); } catch (InterruptedException e) { };
+                                    new ConnectionsPreferencesDialog();
+                                    System.out.format("Show preferences done%n");
                                     
                                     // For testing only
                                     // Quit program
@@ -459,23 +470,38 @@ public class JmriConfigurationManager implements ConfigureManager {
     
     
     
+//    private static final class ConnectionsPreferencesDialog extends JDialog {
     private static final class ConnectionsPreferencesDialog extends JDialog {
         
         ConnectionsPreferencesDialog() {
             super();
+            System.out.format("AAA%n");
             setTitle("Connections preferences");
             setModal(true);
             
+            System.out.format("BBB%n");
             ConnectionsPanel contentPanel = new ConnectionsPanel();
+            System.out.format("CCC%n");
             
             setContentPane(contentPanel);
             
+            System.out.format("DDD%n");
             pack();
             
+            System.out.format("EEE%n");
             // Center dialog on screen
             setLocationRelativeTo(null);
+            System.out.format("FFF%n");
             
+//            contentPanel.addPrefencePanel();
+            System.out.format("FFFFFFF%n");
             setVisible(true);
+            System.out.format("GGG%n");
+            
+//            contentPanel.addPrefencePanel();
+//            SwingUtilities.updateComponentTreeUI(this);
+//            this.revalidate();
+            System.out.format("HHH%n");
         }
         
     }
@@ -489,8 +515,11 @@ public class JmriConfigurationManager implements ConfigureManager {
          */
         private final List<PreferencesPanel> prefPanels = new ArrayList<>();
         
+        private final JPanel detailpanel;
+        
         ConnectionsPanel() {
             
+            System.out.format("aaa%n");
             JList list = new JList<>();
             JScrollPane listScroller = new JScrollPane(list);
             listScroller.setPreferredSize(new Dimension(100, 100));
@@ -498,6 +527,7 @@ public class JmriConfigurationManager implements ConfigureManager {
             buttonpanel.setLayout(new BoxLayout(buttonpanel, BoxLayout.Y_AXIS));
             buttonpanel.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 3));
             
+            System.out.format("bbb%n");
             buttonpanel.removeAll();
             List<String> choices = new ArrayList();
             choices.add("Connections");
@@ -509,7 +539,8 @@ public class JmriConfigurationManager implements ConfigureManager {
             buttonpanel.add(listScroller);
             
             
-            JPanel detailpanel = new JPanel();
+            System.out.format("ccc%n");
+            detailpanel = new JPanel();
             detailpanel.setLayout(new CardLayout());
             detailpanel.setBorder(BorderFactory.createEmptyBorder(6, 3, 6, 6));
             detailpanel.setPreferredSize(new Dimension(700, 400));
@@ -532,25 +563,51 @@ public class JmriConfigurationManager implements ConfigureManager {
             
             setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
             
+            System.out.format("ddd%n");
+            
+            JTabbedPane tabbedPane = new JTabbedPane();
             for (PreferencesPanel panel : ServiceLoader.load(PreferencesPanel.class)) {
+//            for (PreferencesPanel panel : InstanceManager.getList(jmri.swing.PreferencesPanel.class)) {
+                System.out.format("dddddd%n");
                 if (panel instanceof jmri.jmrix.swing.ConnectionsPreferencesPanel) {
+                    System.out.format("eee%n");
                     prefPanels.add(panel);
                     detailpanel.add(panel.getPreferencesComponent());
-//                    ((jmri.jmrix.swing.ConnectionsPreferencesPanel) panel).validate();
+//                    detailpanel.add(panel.getPreferencesComponent(), "DANIEL");
+//                    ThreadingUtil.runOnGUI(() -> {
+//DANIEL                        detailpanel.add(panel.getPreferencesComponent());
+//                    });
+//                    JScrollPane scroller = new JScrollPane(panel.getPreferencesComponent());
+//                    scroller.setBorder(BorderFactory.createEmptyBorder());
+//                    detailpanel.add(scroller);
                 }
             }
             
+            System.out.format("hhh%n");
             add(buttonpanel);
             add(new JSeparator(JSeparator.VERTICAL));
             add(detailpanel);
+            System.out.format("iii%n");
             list.setSelectedIndex(0);
             
+//            CardLayout cl = (CardLayout) (detailpanel.getLayout());
+//            cl.show(detailpanel, "DANIEL");
+            
+            System.out.format("jjj%n");
 //            detailpanel.revalidate();
 //            test(detailpanel.getComponent(0));
             
             // For testing only! Must be removed!
 //            Object comboBox = ((java.awt.Container)((java.awt.Container)((java.awt.Container)((java.awt.Container)((java.awt.Container)detailpanel.getComponent(0)).getComponent(0)).getComponent(0)).getComponent(0)).getComponent(3)).getComponent(0);
 //            ((javax.swing.JComboBox)comboBox).setSelectedIndex(((javax.swing.JComboBox)comboBox).getSelectedIndex());
+        }
+        
+        private void addPrefencePanel() {
+            if (prefPanels.size() != 1) {
+                throw new RuntimeException("There must be one and only one preferencepanel");
+            }
+            detailpanel.removeAll();
+            detailpanel.add(prefPanels.get(0).getPreferencesComponent());
         }
         
         private void test(java.awt.Component c) {
