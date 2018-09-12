@@ -16,6 +16,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -79,10 +80,17 @@ public class TabbedPreferences extends AppConfigBase {
         detailpanel.setLayout(new CardLayout());
     }
 
+    /**
+     * The dialog that displays the preferences, if displayed in a dialog.
+     * Used by the quit button to dispose the dialog.
+     */
+    JDialog dialog = null;
+    
     ArrayList<PreferencesCatItems> preferencesArray = new ArrayList<>();
     JPanel buttonpanel;
     JList<String> list;
     JButton save;
+    JButton quit = null;
     JScrollPane listScroller;
     private int initialisationState = 0x00;
 
@@ -133,8 +141,22 @@ public class TabbedPreferences extends AppConfigBase {
      *
      * @return The current state, which should be INITIALISED if all is well.
      */
+    public int init() {
+        return init(null, false);
+    }
+    
+    /**
+     * Initialize, including loading classes provided by a
+     * {@link java.util.ServiceLoader}.
+     * <p>
+     * Keeps a current state to prevent doing its work twice.
+     *
+     * @param filterPreferences filter which preferences to show
+     * @param addQuitButton add a quit button to the form?
+     * @return The current state, which should be INITIALISED if all is well.
+     */
     @SuppressWarnings("rawtypes")
-    public synchronized int init() {
+    public synchronized int init(FilterPreferences filterPreferences, boolean addQuitButton) {
         if (initialisationState == INITIALISED) {
             return INITIALISED;
         }
@@ -162,36 +184,51 @@ public class TabbedPreferences extends AppConfigBase {
             savePressed(invokeSaveOptions());
         });
 
+        if (addQuitButton) {
+            quit = new JButton(
+                    ConfigBundle.getMessage("ButtonQuit"));
+//                    new ImageIcon(FileUtil.findURL("program:resources/icons/misc/gui3/SaveIcon.png", FileUtil.Location.INSTALLED)));
+            quit.addActionListener((ActionEvent e) -> {
+                if (dialog != null) {
+                    dialog.dispose();
+                }
+            });
+        }
+
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         // panels that are dependent upon another panel being added first
         Set<PreferencesPanel> delayed = new HashSet<>();
 
         // add preference panels registered with the Instance Manager
         for (PreferencesPanel panel : InstanceManager.getList(jmri.swing.PreferencesPanel.class)) {
-            if (panel instanceof PreferencesSubPanel) {
-                String parent = ((PreferencesSubPanel) panel).getParentClassName();
-                if (!this.getPreferencesPanels().containsKey(parent)) {
-                    delayed.add(panel);
-                } else {
-                    ((PreferencesSubPanel) panel).setParent(this.getPreferencesPanels().get(parent));
+            if ((filterPreferences == null) || filterPreferences.filter(panel)) {
+                if (panel instanceof PreferencesSubPanel) {
+                    String parent = ((PreferencesSubPanel) panel).getParentClassName();
+                    if (!this.getPreferencesPanels().containsKey(parent)) {
+                        delayed.add(panel);
+                    } else {
+                        ((PreferencesSubPanel) panel).setParent(this.getPreferencesPanels().get(parent));
+                    }
                 }
-            }
-            if (!delayed.contains(panel)) {
-                this.addPreferencesPanel(panel);
+                if (!delayed.contains(panel)) {
+                    this.addPreferencesPanel(panel);
+                }
             }
         }
 
         for (PreferencesPanel panel : ServiceLoader.load(PreferencesPanel.class)) {
-            if (panel instanceof PreferencesSubPanel) {
-                String parent = ((PreferencesSubPanel) panel).getParentClassName();
-                if (!this.getPreferencesPanels().containsKey(parent)) {
-                    delayed.add(panel);
-                } else {
-                    ((PreferencesSubPanel) panel).setParent(this.getPreferencesPanels().get(parent));
+            if ((filterPreferences == null) || filterPreferences.filter(panel)) {
+                if (panel instanceof PreferencesSubPanel) {
+                    String parent = ((PreferencesSubPanel) panel).getParentClassName();
+                    if (!this.getPreferencesPanels().containsKey(parent)) {
+                        delayed.add(panel);
+                    } else {
+                        ((PreferencesSubPanel) panel).setParent(this.getPreferencesPanels().get(parent));
+                    }
                 }
-            }
-            if (!delayed.contains(panel)) {
-                this.addPreferencesPanel(panel);
+                if (!delayed.contains(panel)) {
+                    this.addPreferencesPanel(panel);
+                }
             }
         }
         while (!delayed.isEmpty()) {
@@ -402,6 +439,10 @@ public class TabbedPreferences extends AppConfigBase {
         });
         buttonpanel.add(listScroller);
         buttonpanel.add(save);
+        
+        if (quit != null) {
+            buttonpanel.add(quit);
+        }
     }
 
     public boolean isPreferencesValid() {
@@ -617,6 +658,22 @@ public class TabbedPreferences extends AppConfigBase {
         }
     }
 
+    /**
+     * Filter preferences.
+     * 
+     * This interface allows to select which preferences to show.
+     */
+    public interface FilterPreferences {
+        
+        /**
+         * Filter a preference.
+         * @param panel The panel to filter
+         * @return true if this panel should be shown
+         */
+        boolean filter(PreferencesPanel panel);
+        
+    }
+    
     private final static Logger log = LoggerFactory.getLogger(TabbedPreferences.class);
 
 }

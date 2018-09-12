@@ -4,6 +4,7 @@ import apps.AppsBase;
 import apps.ConfigBundle;
 import apps.gui3.TabbedPreferences;
 import apps.gui3.TabbedPreferencesAction;
+import apps.gui3.TabbedPreferencesDialog;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
@@ -251,6 +252,7 @@ public class JmriConfigurationManager implements ConfigureManager {
                                     break;
                                     
                                 case EDIT_CONNECTIONS:
+/*                                    
                                     final Object waiter = new Object();
                                     try {
                                         while (jmri.InstanceManager.getDefault(TabbedPreferences.class).init() != TabbedPreferences.INITIALISED) {
@@ -263,10 +265,19 @@ public class JmriConfigurationManager implements ConfigureManager {
                                     }
                                     
                                     new ConnectionsPreferencesDialog();
+*/
+                                    TabbedPreferences.FilterPreferences filterPreferences
+                                            = (PreferencesPanel panel) -> (panel instanceof jmri.jmrix.swing.ConnectionsPreferencesPanel);
                                     
-                                    // Restart program
-                                    AppsBase.handleRestart();
-                                    break;
+                                    if (TabbedPreferencesDialog.showDialog(filterPreferences, true)) {
+                                        // Restart program
+                                        AppsBase.handleRestart();
+                                        break;
+                                    } else {
+                                        // Quit program
+                                        AppsBase.handleQuit();
+                                        break;
+                                    }
                                     
                                 case EXIT_PROGRAM:
                                 default:
