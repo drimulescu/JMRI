@@ -111,7 +111,6 @@ public class EditConnectionPreferences extends AppConfigBase {
      * <p>
      * Keeps a current state to prevent doing its work twice.
      */
-//    @SuppressWarnings("rawtypes")
     public void init() {
         list = new JList<>();
         listScroller = new JScrollPane(list);
@@ -143,11 +142,7 @@ public class EditConnectionPreferences extends AppConfigBase {
 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         getTabbedPreferences().preferencesArray.stream().forEach((preferences) -> {
-//        preferencesArray.stream().forEach((preferences) -> {
             detailpanel.add(preferences.getPanel(), preferences.getPrefItem());
-            JPanel panel = new JPanel();
-            panel.add(new JButton("Test"));
-//            detailpanel.add(panel, preferences.getPrefItem());
         });
         JPanel panel = new JPanel();
         panel.add(new JButton("Test"));
