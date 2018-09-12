@@ -28,9 +28,12 @@ public final class EditConnectionPreferencesDialog extends JDialog implements Wi
         return true;
     }
     
-    public static boolean showDialog(TabbedPreferences.FilterPreferences filterPreferences, boolean addQuitButton) {
+    public static boolean showDialog() {
         try {
-            while (jmri.InstanceManager.getDefault(TabbedPreferences.class).init(filterPreferences, addQuitButton) != TabbedPreferences.INITIALISED) {
+            TabbedPreferences.FilterPreferences filterPreferences
+                    = (PreferencesPanel panel) -> (panel instanceof jmri.jmrix.swing.ConnectionsPreferencesPanel);
+            
+            while (jmri.InstanceManager.getDefault(TabbedPreferences.class).init(filterPreferences) != TabbedPreferences.INITIALISED) {
                 final Object waiter = new Object();
                 synchronized (waiter) {
                     waiter.wait(50);
@@ -40,9 +43,6 @@ public final class EditConnectionPreferencesDialog extends JDialog implements Wi
             EditConnectionPreferencesDialog dialog = new EditConnectionPreferencesDialog();
             SwingUtilities.updateComponentTreeUI(dialog);
             
-            // might not be a preferences item set yet
-//            if (preferencesItem != null) f.gotoPreferenceItem(preferencesItem, preferenceSubCat);
-
             dialog.pack();
             dialog.setVisible(true);
             return false;
@@ -55,13 +55,9 @@ public final class EditConnectionPreferencesDialog extends JDialog implements Wi
     public EditConnectionPreferencesDialog() {
         super();
         setModal(true);
-//        TabbedPreferences tabbedPreferences = editConnectionPreferences;
-//        TabbedPreferences tabbedPreferences = editConnectionPreferences;
         editConnectionPreferences = new EditConnectionPreferences(this);
-//        EditConnectionPreferences tabbedPreferences = editConnectionPreferences;
         editConnectionPreferences.init();
         add(editConnectionPreferences);
-//        add(editConnectionPreferences);
 //        addHelpMenu("package.apps.TabbedPreferences", true); // NOI18N
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(this);

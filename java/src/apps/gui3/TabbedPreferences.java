@@ -80,12 +80,6 @@ public class TabbedPreferences extends AppConfigBase {
         detailpanel.setLayout(new CardLayout());
     }
 
-    /**
-     * The dialog that displays the preferences, if displayed in a dialog.
-     * Used by the quit button to dispose the dialog.
-     */
-    JDialog dialog = null;
-    
     ArrayList<PreferencesCatItems> preferencesArray = new ArrayList<>();
     JPanel buttonpanel;
     JList<String> list;
@@ -142,7 +136,7 @@ public class TabbedPreferences extends AppConfigBase {
      * @return The current state, which should be INITIALISED if all is well.
      */
     public int init() {
-        return init(null, false);
+        return init(null);
     }
     
     /**
@@ -152,11 +146,10 @@ public class TabbedPreferences extends AppConfigBase {
      * Keeps a current state to prevent doing its work twice.
      *
      * @param filterPreferences filter which preferences to show
-     * @param addQuitButton add a quit button to the form?
      * @return The current state, which should be INITIALISED if all is well.
      */
     @SuppressWarnings("rawtypes")
-    public synchronized int init(FilterPreferences filterPreferences, boolean addQuitButton) {
+    public synchronized int init(FilterPreferences filterPreferences) {
         if (initialisationState == INITIALISED) {
             return INITIALISED;
         }
@@ -183,17 +176,6 @@ public class TabbedPreferences extends AppConfigBase {
         save.addActionListener((ActionEvent e) -> {
             savePressed(invokeSaveOptions());
         });
-
-        if (addQuitButton) {
-            quit = new JButton(
-                    ConfigBundle.getMessage("ButtonQuit"));
-//                    new ImageIcon(FileUtil.findURL("program:resources/icons/misc/gui3/SaveIcon.png", FileUtil.Location.INSTALLED)));
-            quit.addActionListener((ActionEvent e) -> {
-                if (dialog != null) {
-                    dialog.dispose();
-                }
-            });
-        }
 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         // panels that are dependent upon another panel being added first

@@ -105,12 +105,6 @@ public class EditConnectionPreferences extends AppConfigBase {
                 .getString("MenuConnections"), 100));
     }
 
-    /**
-     * Initialize, including loading classes provided by a
-     * {@link java.util.ServiceLoader}.
-     * <p>
-     * Keeps a current state to prevent doing its work twice.
-     */
     public void init() {
         list = new JList<>();
         listScroller = new JScrollPane(list);
@@ -266,14 +260,6 @@ public class EditConnectionPreferences extends AppConfigBase {
         return choices;
     }
 
-    /*
-     * Returns a list of Sub Category Items for a give category
-     */
-    public List<String> getPreferenceSubCategory(String category) {
-        int index = getCategoryIndexFromString(category);
-        return preferencesArray.get(index).getSubCategoriesList();
-    }
-
     int getCategoryIndexFromString(String category) {
         for (int x = 0; x < preferencesArray.size(); x++) {
             if (preferencesArray.get(x).getPrefItem().equals(category)) {
@@ -281,16 +267,6 @@ public class EditConnectionPreferences extends AppConfigBase {
             }
         }
         return -1;
-    }
-
-    public void disablePreferenceItem(String selection, String subCategory) {
-        if (subCategory == null || subCategory.isEmpty()) {
-            // need to do something here like just disable the item
-
-        } else {
-            preferencesArray.get(getCategoryIndexFromString(selection))
-                    .disableSubCategory(subCategory);
-        }
     }
 
     protected ArrayList<String> getChoices() {
@@ -411,14 +387,6 @@ public class EditConnectionPreferences extends AppConfigBase {
             return itemText;
         }
 
-        ArrayList<String> getSubCategoriesList() {
-            ArrayList<String> choices = new ArrayList<>();
-            for (TabDetails tabDetails : tabDetailsArray) {
-                choices.add(tabDetails.getTitle());
-            }
-            return choices;
-        }
-
         /*
          * This returns a JPanel if only one item is configured for a menu item
          * or it returns a JTabbedFrame if there are multiple managedPreferences for the menu
@@ -455,23 +423,6 @@ public class EditConnectionPreferences extends AppConfigBase {
             for (int i = 0; i < tabDetailsArray.size(); i++) {
                 if (tabDetailsArray.get(i).getTitle().equals(sub)) {
                     tabbedPane.setSelectedIndex(i);
-                    return;
-                }
-            }
-        }
-
-        void disableSubCategory(String sub) {
-            if (tabDetailsArray.isEmpty()) {
-                // So the tab preferences might not have been initialised when
-                // the call to disable an item is called therefore store it for
-                // later on
-                disableItemsList.add(sub);
-                return;
-            }
-            for (int i = 0; i < tabDetailsArray.size(); i++) {
-                if ((tabDetailsArray.get(i).getItem()).getClass().getName()
-                        .equals(sub)) {
-                    tabbedPane.setEnabledAt(i, false);
                     return;
                 }
             }
@@ -538,22 +489,6 @@ public class EditConnectionPreferences extends AppConfigBase {
         }
     }
 
-    /**
-     * Filter preferences.
-     * 
-     * This interface allows to select which preferences to show.
-     */
-    public interface FilterPreferences {
-        
-        /**
-         * Filter a preference.
-         * @param panel The panel to filter
-         * @return true if this panel should be shown
-         */
-        boolean filter(PreferencesPanel panel);
-        
-    }
-    
     /**
      * Ensure a TabbedPreferences instance is always available.
      *
