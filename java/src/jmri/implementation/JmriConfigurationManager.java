@@ -5,6 +5,7 @@ import apps.ConfigBundle;
 import apps.gui3.TabbedPreferences;
 import apps.gui3.TabbedPreferencesAction;
 import apps.gui3.TabbedPreferencesDialog;
+import apps.gui3.TabbedPreferencesDialog_Daniel;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
@@ -240,9 +241,11 @@ public class JmriConfigurationManager implements ConfigureManager {
                             errorList.add("");
                             errorList.add(Bundle.getMessage("InitExMessageLogs")); // NOI18N
                             
-                            ErrorDialog dialog = new ErrorDialog(errorList);
+//                            ErrorDialog dialog = new ErrorDialog(errorList);
                             
-                            switch (dialog.result) {
+//                            switch (dialog.result) {
+                            ErrorDialog.Result result = ErrorDialog.Result.EDIT_CONNECTIONS;
+                            switch (result) {
                                 case NEW_PROFILE:
                                     AddProfileDialog apd = new AddProfileDialog(null, true, false);
                                     apd.setLocationRelativeTo(null);
@@ -269,7 +272,9 @@ public class JmriConfigurationManager implements ConfigureManager {
                                     TabbedPreferences.FilterPreferences filterPreferences
                                             = (PreferencesPanel panel) -> (panel instanceof jmri.jmrix.swing.ConnectionsPreferencesPanel);
                                     
-                                    if (TabbedPreferencesDialog.showDialog(filterPreferences, true)) {
+//                                    if (TabbedPreferencesDialog.showDialog(filterPreferences, true)) {
+                                    if (TabbedPreferencesDialog_Daniel.showDialog(filterPreferences, true)) {
+//                                    if (TabbedPreferencesDialog_Daniel.showDialog(null, true)) {
                                         // Restart program
                                         AppsBase.handleRestart();
                                         break;
