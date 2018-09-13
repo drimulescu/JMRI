@@ -18,6 +18,7 @@ import jmri.swing.PreferencesPanel;
 public final class EditConnectionPreferencesDialog extends JDialog implements WindowListener {
 
     final EditConnectionPreferences editConnectionPreferences;
+    boolean quitProgram = false;
     
     @Override
     public String getTitle() {
@@ -45,7 +46,7 @@ public final class EditConnectionPreferencesDialog extends JDialog implements Wi
             
             dialog.pack();
             dialog.setVisible(true);
-            return false;
+            return dialog.quitProgram;
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
             return false;

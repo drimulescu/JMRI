@@ -7,10 +7,7 @@ import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.ServiceLoader;
-import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -29,7 +26,6 @@ import javax.swing.event.ListSelectionEvent;
 import jmri.InstanceManager;
 import jmri.ShutDownManager;
 import jmri.swing.PreferencesPanel;
-import jmri.swing.PreferencesSubPanel;
 import jmri.util.FileUtil;
 import jmri.util.ThreadingUtil;
 import org.jdom2.Element;
@@ -81,10 +77,10 @@ public class EditConnectionPreferences extends AppConfigBase {
     }
 
     /**
-     * The dialog that displays the preferences, if displayed in a dialog.
+     * The dialog that displays the preferences.
      * Used by the quit button to dispose the dialog.
      */
-    final JDialog dialog;
+    final EditConnectionPreferencesDialog dialog;
     
     ArrayList<PreferencesCatItems> preferencesArray = new ArrayList<>();
     JPanel buttonpanel;
@@ -93,7 +89,7 @@ public class EditConnectionPreferences extends AppConfigBase {
     JButton quit = null;
     JScrollPane listScroller;
 
-    public EditConnectionPreferences(JDialog dialog) {
+    public EditConnectionPreferences(EditConnectionPreferencesDialog dialog) {
 
         this.dialog = dialog;
         
@@ -130,6 +126,7 @@ public class EditConnectionPreferences extends AppConfigBase {
 //                new ImageIcon(FileUtil.findURL("program:resources/icons/misc/gui3/SaveIcon.png", FileUtil.Location.INSTALLED)));
         quit.addActionListener((ActionEvent e) -> {
             if (dialog != null) {
+                dialog.quitProgram;
                 dialog.dispose();
             }
         });
