@@ -18,7 +18,7 @@ import jmri.swing.PreferencesPanel;
 public final class EditConnectionPreferencesDialog extends JDialog implements WindowListener {
 
     final EditConnectionPreferences editConnectionPreferences;
-    boolean quitProgram = false;
+    boolean restartProgram = false;
     
     @Override
     public String getTitle() {
@@ -29,6 +29,10 @@ public final class EditConnectionPreferencesDialog extends JDialog implements Wi
         return true;
     }
     
+    /**
+     * Displays a dialog for editing the conenctions.
+     * @return true if the program should restart, false if the program should quit.
+     */
     public static boolean showDialog() {
         try {
             TabbedPreferences.FilterPreferences filterPreferences
@@ -46,7 +50,7 @@ public final class EditConnectionPreferencesDialog extends JDialog implements Wi
             
             dialog.pack();
             dialog.setVisible(true);
-            return dialog.quitProgram;
+            return dialog.restartProgram;
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
             return false;

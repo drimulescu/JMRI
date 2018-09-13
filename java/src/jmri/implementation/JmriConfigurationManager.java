@@ -240,11 +240,9 @@ public class JmriConfigurationManager implements ConfigureManager {
                             errorList.add("");
                             errorList.add(Bundle.getMessage("InitExMessageLogs")); // NOI18N
                             
-//                            ErrorDialog dialog = new ErrorDialog(errorList);
+                            ErrorDialog dialog = new ErrorDialog(errorList);
                             
-//                            switch (dialog.result) {
-                            ErrorDialog.Result result = ErrorDialog.Result.EDIT_CONNECTIONS;
-                            switch (result) {
+                            switch (dialog.result) {
                                 case NEW_PROFILE:
                                     AddProfileDialog apd = new AddProfileDialog(null, true, false);
                                     apd.setLocationRelativeTo(null);

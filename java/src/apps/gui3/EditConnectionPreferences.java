@@ -118,6 +118,7 @@ public class EditConnectionPreferences extends AppConfigBase {
                 ConfigBundle.getMessage("ButtonSave"),
                 new ImageIcon(FileUtil.findURL("program:resources/icons/misc/gui3/SaveIcon.png", FileUtil.Location.INSTALLED)));
         save.addActionListener((ActionEvent e) -> {
+            dialog.restartProgram = true;
             savePressed(invokeSaveOptions());
         });
 
@@ -126,7 +127,7 @@ public class EditConnectionPreferences extends AppConfigBase {
 //                new ImageIcon(FileUtil.findURL("program:resources/icons/misc/gui3/SaveIcon.png", FileUtil.Location.INSTALLED)));
         quit.addActionListener((ActionEvent e) -> {
             if (dialog != null) {
-                dialog.quitProgram = true;
+                dialog.restartProgram = false;
                 dialog.dispose();
             }
         });
