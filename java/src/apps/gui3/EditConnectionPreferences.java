@@ -126,7 +126,7 @@ public class EditConnectionPreferences extends AppConfigBase {
 //                new ImageIcon(FileUtil.findURL("program:resources/icons/misc/gui3/SaveIcon.png", FileUtil.Location.INSTALLED)));
         quit.addActionListener((ActionEvent e) -> {
             if (dialog != null) {
-                dialog.quitProgram;
+                dialog.quitProgram = true;
                 dialog.dispose();
             }
         });
