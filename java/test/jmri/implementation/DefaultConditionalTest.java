@@ -1,29 +1,35 @@
 package jmri.implementation;
 
+import java.util.Arrays;
+import java.util.ArrayList;
 import jmri.*;
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * Test the DefaultConditional implementation class
  *
  * @author Bob Jacobsen Copyright (C) 2015
  */
-public class DefaultConditionalTest extends NamedBeanTest {
+public class DefaultConditionalTest {
 
     /**
      * Operate parent NamedBeanTest tests.
      */
-    @Override
-    protected NamedBean createInstance() {
-        return new DefaultConditional("IXIC 0");
+    @Test
+    public void createInstance() {
+        new DefaultConditional("IXIC 0");
     }
 
+    @Test
     public void testCtor() {
         Assert.assertNotNull("exists",new DefaultConditional("IXIC 1"));
     }
 
+    @Test
     public void testBasicBeanOperations() {
         Conditional ix1 = new DefaultConditional("IXIC 2");
 
@@ -33,19 +39,69 @@ public class DefaultConditionalTest extends NamedBeanTest {
         Assert.assertTrue("object not equals reverse", !ix2.equals(ix1));
 
         Assert.assertTrue("hash not equals", ix1.hashCode() != ix2.hashCode());
+    }
+    
+    @Test
+    public void testCalculate() {
+        Conditional ix1 = new DefaultConditional("IXIC 1");
+        Assert.assertTrue("calculate() returns NamedBean.UNKNOWN", ix1.calculate(false, null) == NamedBean.UNKNOWN);
+        
+        ArrayList<ConditionalVariable> conditionalVariablesList_TrueTrueTrue
+                = new ArrayList<>();
+        conditionalVariablesList_TrueTrueTrue.add(new ConditionalVariableStatic(Conditional.TRUE));
+        conditionalVariablesList_TrueTrueTrue.add(new ConditionalVariableStatic(Conditional.TRUE));
+        conditionalVariablesList_TrueTrueTrue.add(new ConditionalVariableStatic(Conditional.TRUE));
+        
+        ArrayList<ConditionalVariable> conditionalVariablesList_FalseFalseFalse
+                = new ArrayList<>();
+        conditionalVariablesList_FalseFalseFalse.add(new ConditionalVariableStatic(Conditional.FALSE));
+        conditionalVariablesList_FalseFalseFalse.add(new ConditionalVariableStatic(Conditional.FALSE));
+        conditionalVariablesList_FalseFalseFalse.add(new ConditionalVariableStatic(Conditional.FALSE));
+        
+        ArrayList<ConditionalVariable> conditionalVariablesList_TrueTrueFalse
+                = new ArrayList<>();
+        conditionalVariablesList_TrueTrueFalse.add(new ConditionalVariableStatic(Conditional.TRUE));
+        conditionalVariablesList_TrueTrueFalse.add(new ConditionalVariableStatic(Conditional.TRUE));
+        conditionalVariablesList_TrueTrueFalse.add(new ConditionalVariableStatic(Conditional.FALSE));
+        
+        ArrayList<ConditionalVariable> conditionalVariablesList_FalseTrueTrue
+                = new ArrayList<>();
+        conditionalVariablesList_FalseTrueTrue.add(new ConditionalVariableStatic(Conditional.FALSE));
+        conditionalVariablesList_FalseTrueTrue.add(new ConditionalVariableStatic(Conditional.TRUE));
+        conditionalVariablesList_FalseTrueTrue.add(new ConditionalVariableStatic(Conditional.TRUE));
 
+        ArrayList<ConditionalVariable> conditionalVariablesList_TrueFalseTrue
+                = new ArrayList<>();
+        conditionalVariablesList_TrueFalseTrue.add(new ConditionalVariableStatic(Conditional.TRUE));
+        conditionalVariablesList_TrueFalseTrue.add(new ConditionalVariableStatic(Conditional.FALSE));
+        conditionalVariablesList_TrueFalseTrue.add(new ConditionalVariableStatic(Conditional.TRUE));
+        
+        ArrayList<ConditionalVariable> conditionalVariablesList_FalseTrueFalse
+                = new ArrayList<>();
+        conditionalVariablesList_FalseTrueFalse.add(new ConditionalVariableStatic(Conditional.FALSE));
+        conditionalVariablesList_FalseTrueFalse.add(new ConditionalVariableStatic(Conditional.TRUE));
+        conditionalVariablesList_FalseTrueFalse.add(new ConditionalVariableStatic(Conditional.FALSE));
+        
+        
+        
+        ix1 = new DefaultConditional("IXIC 1");
+        ix1.setLogicType(Conditional.ALL_AND, "");
+        ix1.setStateVariables(conditionalVariablesList_TrueTrueTrue);
+        Assert.assertTrue("calculate() returns NamedBean.TRUE", ix1.calculate(false, null) == Conditional.TRUE);
+        
+        ix1 = new DefaultConditional("IXIC 1");
+        ix1.setLogicType(Conditional.ALL_AND, "");
+        ix1.setStateVariables(conditionalVariablesList_TrueTrueFalse);
+        Assert.assertTrue("calculate() returns NamedBean.FALSE", ix1.calculate(false, null) == Conditional.FALSE);
     }
 
+    
     // from here down is testing infrastructure
-    public DefaultConditionalTest(String s) {
-        super(s);
-    }
 
     // The minimal setup for log4J
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         jmri.util.JUnitUtil.setUp();
-        super.setUp();
         jmri.util.JUnitUtil.resetInstanceManager();
         jmri.util.JUnitUtil.initInternalTurnoutManager();
         jmri.util.JUnitUtil.initInternalLightManager();
@@ -53,21 +109,24 @@ public class DefaultConditionalTest extends NamedBeanTest {
         jmri.util.JUnitUtil.initIdTagManager();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         jmri.util.JUnitUtil.tearDown();
     }
 
-    // Main entry point
-    static public void main(String[] args) {
-        String[] testCaseName = {DefaultConditionalTest.class.getName()};
-        junit.textui.TestRunner.main(testCaseName);
+    
+    private final class ConditionalVariableStatic extends ConditionalVariable {
+        
+        ConditionalVariableStatic(int state) {
+            super();
+            super.setState(state);
+        }
+        
+        @Override
+        public boolean evaluate() {
+            return this.getState() == Conditional.TRUE;
+        }
+        
     }
-
-    // test suite from all defined tests
-    public static Test suite() {
-        TestSuite suite = new TestSuite(DefaultConditionalTest.class);
-        return suite;
-    }
-
+    
 }
