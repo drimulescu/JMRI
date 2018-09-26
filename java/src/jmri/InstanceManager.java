@@ -74,6 +74,19 @@ import org.slf4j.LoggerFactory;
  */
 public final class InstanceManager {
 
+    /**
+     * This class is used to save and restore all managers.
+     * This is used in some tests, for example
+     * jmri.jmrit.display.layoutEditor.LayoutEditorExtendedTest.
+     */
+    public final class Managers {
+        private final Map<Class<?>, List<Object>> managerLists;
+        
+        private Managers(Map<Class<?>, List<Object>> managerLists) {
+            this.managerLists = Collections.synchronizedMap(new HashMap<>(managerLists));
+        }
+    }
+    
     // data members to hold contact with the property listeners
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private final Map<Class<?>, List<Object>> managerLists = Collections.synchronizedMap(new HashMap<>());
@@ -842,6 +855,22 @@ public final class InstanceManager {
         });
         setInitializationState(type, InitializationState.NOTSET); // initialization will have to be redone
         managerLists.put(type, new ArrayList<>());
+    }
+    
+    /**
+     * Save all the managers.
+     * @return the managers
+     */
+    public Managers saveManagers() {
+        return new Managers(managerLists);
+    }
+
+    /**
+     * Restore all the managers.
+     */
+    public void saveManagers(Managers managers) {
+        clearAll();
+        return new Managers(managerLists);
     }
 
     /**
