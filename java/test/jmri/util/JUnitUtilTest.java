@@ -51,6 +51,13 @@ public class JUnitUtilTest {
         jmri.util.JUnitUtil.initLogixManager(); // Logix sist?
         jmri.util.JUnitUtil.initIdTagManager();
         
+        // Test to manually get an instance of SignalSpeedMap
+        try {
+            InstanceManager.getDefault(jmri.implementation.SignalSpeedMap.class);
+        } catch (Exception ex) {
+            System.out.format("InstanceManager.getDefault(jmri.implementation.SignalSpeedMap.class) throws exception %s%n", ex.getMessage());
+        }
+        
         InstanceManager instanceManager = InstanceManager.getDefault();
         
         System.out.format("--------------------------------%n");
@@ -75,16 +82,19 @@ public class JUnitUtilTest {
         Assert.assertTrue("we have 42 managers", instanceManager.getAllManagers().size() == 42);
         
         instanceManager = getNewInstanceManager();
+        Assert.assertTrue("we have 42 managers", instanceManager.getAllManagers().size() == 42);
         // jmri.implementation.SignalSpeedMap is missing
-        Assert.assertTrue("we have 41 managers", instanceManager.getAllManagers().size() == 41);
+//        Assert.assertTrue("we have 41 managers", instanceManager.getAllManagers().size() == 41);
         
         instanceManager = getNewInstanceManager();
+        Assert.assertTrue("we have 42 managers", instanceManager.getAllManagers().size() == 42);
         // Same as previous
-        Assert.assertTrue("we have 41 managers", instanceManager.getAllManagers().size() == 41);
+//        Assert.assertTrue("we have 41 managers", instanceManager.getAllManagers().size() == 41);
         
         instanceManager = getNewInstanceManager();
+        Assert.assertTrue("we have 42 managers", instanceManager.getAllManagers().size() == 42);
         // Same as previous
-        Assert.assertTrue("we have 41 managers", instanceManager.getAllManagers().size() == 41);
+//        Assert.assertTrue("we have 41 managers", instanceManager.getAllManagers().size() == 41);
     }
     
     @Ignore
