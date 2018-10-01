@@ -159,6 +159,7 @@ public final class InstanceManager {
         if (index != -1) { // -1 means items was not in list, and therefor, not registered
             l.remove(item);
             if (item instanceof Disposable) {
+                System.out.format("item: %s%n", item.getClass().getName());
                 dispose((Disposable) item);
             }
         }

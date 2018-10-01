@@ -13,6 +13,7 @@ import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SignalSystemTest {
 
+    @Ignore
     @Test
     public void testLoadSimplePanelOBlocksDB1969() throws jmri.JmriException {
         Assume.assumeFalse(GraphicsEnvironment.isHeadless());
@@ -95,7 +97,18 @@ public class SignalSystemTest {
         checkAspect("IF$vsm:DB-HV-1969:shunting_dwarf($0012)", "Sh0");
 
     }
+    
+    @Test
+    public void testSomething() {
+        
+    }
 
+    @Test
+    public void testSomething2() {
+        
+    }
+
+    @Ignore
     @Test
     public void testLoadAA1UPtest() throws jmri.JmriException {
         Assume.assumeFalse(GraphicsEnvironment.isHeadless());
@@ -175,12 +188,37 @@ public class SignalSystemTest {
     public void setUp() {
         JUnitUtil.setUp();
         jmri.util.JUnitUtil.resetProfileManager();
-        JUnitUtil.initConfigureManager();
+//        JUnitUtil.initConfigureManager();
         InstanceManager.store(new NamedBeanHandleManager(), NamedBeanHandleManager.class);
         JUnitUtil.initInternalTurnoutManager();
         JUnitUtil.initInternalLightManager();
         JUnitUtil.initInternalSensorManager();
         JUnitUtil.initMemoryManager();
+        
+        JUnitUtil.initDefaultUserMessagePreferences();
+        JUnitUtil.initRouteManager();
+        JUnitUtil.initReporterManager();
+        JUnitUtil.initOBlockManager();
+        JUnitUtil.initWarrantManager();
+        JUnitUtil.initSignalMastLogicManager();
+        JUnitUtil.initLayoutBlockManager();
+        JUnitUtil.initSectionManager();
+        JUnitUtil.initInternalSignalHeadManager();
+        JUnitUtil.initDefaultSignalMastManager();
+        JUnitUtil.initDebugCommandStation();
+        JUnitUtil.initDebugThrottleManager();
+        JUnitUtil.initDebugProgrammerManager();
+        JUnitUtil.initDebugPowerManager();
+//        JUnitUtil.initIdTagManager();
+        JUnitUtil.initRailComManager();
+//        JUnitUtil.initLogixManager();
+        JUnitUtil.initConditionalManager();
+        
+        
+        
+//        JUnitUtil.initConfigureManager();
+//        JUnitUtil.initIdTagManager();
+//        JUnitUtil.initLogixManager();
     }
 
     @After
