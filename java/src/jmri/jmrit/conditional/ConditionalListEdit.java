@@ -1728,7 +1728,7 @@ public class ConditionalListEdit extends ConditionalEditBase {
         for (int i = 0; i < Conditional.ITEM_TO_MEMORY_TEST.length; i++) {
             _variableCompareTypeBox.addItem(ConditionalVariable.describeState(Conditional.ITEM_TO_MEMORY_TEST[i]));
         }
-        _variableComparePanel.add(makeEditPanel(_variableCompareTypeBox, "LabelCompareType", "CompareTypeHint"));  // NOI18N
+        _variableComparePanel.add(makeEditPanel(_variablaaaaaeCompareTypeBox, "LabelCompareType", "CompareTypeHint"));  // NOI18N
         _variableComparePanel.setVisible(false);
         _variableCompareTypeBox.addActionListener(new ActionListener() {
             @Override
