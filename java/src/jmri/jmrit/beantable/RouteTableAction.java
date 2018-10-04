@@ -1535,6 +1535,8 @@ public class RouteTableAction extends AbstractTableAction<Route> {
             if (mode == Route.ONTHROWN) {
                 type = Turnout.THROWN;
             }
+            // DANIEL !!!!
+            System.out.format("RouteTableAction: Rad 1539: type: %d%n", type);
             variableList.add(new ConditionalVariable(false, Conditional.Operator.NONE,
                     type, turnoutLockSystemName, true));
 

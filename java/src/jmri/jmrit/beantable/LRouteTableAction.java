@@ -633,6 +633,8 @@ public class LRouteTableAction extends AbstractTableAction<Logix> {
             List<ConditionalVariable> varList = c.getCopyOfStateVariables();
             for (int k = 0; k < varList.size(); k++) {
                 ConditionalVariable variable = varList.get(k);
+                // DANIEL !!!!
+                System.out.format("Rad 637: variable.getType(): %d%n", variable.getType());
                 int testState = variable.getType();
                 //boolean negated = variable.isNegated();
                 int type;
@@ -756,6 +758,8 @@ public class LRouteTableAction extends AbstractTableAction<Logix> {
             int atype = 0;
             for (int k = 0; k < varList.size(); k++) {
                 ConditionalVariable variable = varList.get(k);
+                // DANIEL !!!!
+                System.out.format("Rad 762: variable.getType(): %d%n", variable.getType());
                 int testState = variable.getType();
                 int type;
                 switch (testState) {
@@ -1490,6 +1494,8 @@ public class LRouteTableAction extends AbstractTableAction<Logix> {
                 }
                 int state = elt.getState();
                 if (VETO < state) {
+                    // DANIEL !!!!
+                    System.out.format("Rad 1498: state: %d%n", state);
                     vetoList.add(new ConditionalVariable(true, opern, (state & ~VETO), name, _newRouteType));
                 }
             }
@@ -1528,8 +1534,12 @@ public class LRouteTableAction extends AbstractTableAction<Logix> {
                             default:
                                 log.debug("updatePressed: Unknown state variable type " + elt.getType());
                         }
+                        // DANIEL !!!!
+                        System.out.format("Rad 1538: type: %d%n", type);
                         twoTriggerList.add(new ConditionalVariable(false, opern, type, name, true));
                     } else {
+                        // DANIEL !!!!
+                        System.out.format("Rad 1542: type: %d%n", type);
                         oneTriggerList.add(new ConditionalVariable(false, opern, type, name, true));
                     }
                 }
@@ -1736,6 +1746,8 @@ public class LRouteTableAction extends AbstractTableAction<Logix> {
                     if (eltName == null || eltName.length() == 0) {
                         eltName = elt.getSysName();
                     }
+                    // DANIEL !!!!
+                    System.out.format("Rad 1750: varType: %d%n", varType);
                     vList.add(new ConditionalVariable(false, Conditional.Operator.AND,
                             varType, eltName, true));
                 }
